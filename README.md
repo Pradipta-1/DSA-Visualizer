@@ -14,6 +14,8 @@ The project is designed to make DSA easier to learn by showing **what an algorit
 
 The visualizer uses a step-based execution model so operations can be observed one step at a time.
 
+Live time voice assistant option 
+
 Currently implemented interactive areas include:
 
 - Linear Search
