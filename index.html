@@ -738,6 +738,11 @@ body.ce-modal-open{ overflow:hidden; }
   .header-action{flex:1;justify-content:center;}
 }
 @media (max-width:700px){
+  .list-viz{--list-gesture-scale:1.15;gap:12px;padding:24px 16px 30px;}
+  .list-node{min-width:108px;}
+  .list-node .node-data{min-width:62px;padding:17px 10px;font-size:18px;}
+  .list-node .node-ref{min-width:46px;padding:9px 6px;font-size:9px;}
+  .list-gesture-hint{display:block;position:absolute;left:50%;bottom:2px;transform:translateX(-50%);font:700 9px var(--font-mono);color:var(--text-2);white-space:nowrap;opacity:.9;}
   .navbar{padding:10px 12px;}
   .nav-left{gap:10px;}
   .brand{font-size:15px;}
@@ -748,10 +753,10 @@ body.ce-modal-open{ overflow:hidden; }
   .sidebar{top:54px;width:min(320px,88vw);}
   .sidebar-scrim{display:block;position:fixed;inset:54px 0 0 0;z-index:89;background:rgba(0,0,0,.5);opacity:0;visibility:hidden;transition:.2s;}
   .sidebar-scrim.open{opacity:1;visibility:visible;}
-  #canvasArea{padding:24px 14px;min-height:300px;}
+  #canvasArea{padding:20px 14px 122px;min-height:360px;}
   .bars-viz{height:220px;gap:6px;padding:0 3px 6px;}
   .bar-cell{min-width:18px;}
-  .bar{font-size:11px;border-radius:7px 7px 5px 5px;padding-top:7px;}
+  .bar{width:78%;font-size:11px;border-radius:7px 7px 5px 5px;padding-top:7px;}
   .bar-tag{font-size:8px;padding:2px 5px;}
   .legend{padding:9px 12px;gap:6px;}
   .legend-key{padding:5px 9px;font-size:10.5px;}
@@ -827,8 +832,8 @@ select:focus, input:focus{ border-color:var(--accent); }
 /* justify-content:center + overflow:auto crops unreachable content on small screens
    (scrollLeft cannot go negative). flex-start + margin:auto centers when there is room
    and stays fully scrollable when the visualization is wider than the viewport. */
-#canvasArea{ flex:1; position:relative; min-height:320px; overflow:auto; padding:30px 34px; display:flex; align-items:center; justify-content:flex-start; }
-#canvasContent{ margin:auto; max-width:100%; }
+#canvasArea{ flex:1; position:relative; min-height:340px; overflow:auto; padding:10px 34px 112px; display:flex; align-items:flex-start; justify-content:flex-start; }
+#canvasContent{ margin:0 auto; max-width:100%; --viz-gesture-scale:1; transform:scale(var(--viz-gesture-scale)); transform-origin:center top; will-change:transform; touch-action:auto; }
 
 /* ===================== MOBILE VISUALIZATION ZOOM =====================
    Keep every visualization's desktop geometry/pattern unchanged. On narrow
@@ -837,22 +842,83 @@ select:focus, input:focus{ border-color:var(--accent); }
 ===================================================================== */
 @media (max-width:700px){
   #canvasContent{
-    /* JS sets this dynamically when the rendered visual exceeds the viewport. */
+    /* A small default enlargement keeps compact structures readable on phones.
+       Pinch zoom changes only the visualization, never the live explanation. */
     zoom:1;
     width:100%;
     max-width:none;
+    --viz-gesture-scale:1.08;
+    touch-action:pan-x pan-y;
   }
-  /* Prevent accidental page-level horizontal scroll caused by a visualization
-     before the dynamic zoom value is applied. Internal geometry is unchanged. */
   #canvasArea{
-    overflow-x:hidden;
+    /* Preserve sideways room for wide structures; the top/bottom air is kept
+       intentionally small because the live explanation occupies the bottom. */
+    overflow-x:auto;
+    overflow-y:auto;
+    min-height:330px;
+    padding:6px 14px 108px;
   }
+  .viz-mobile-zoom-hint{display:block;}
 }
-.canvas-bg-grid{
-  position:absolute; inset:0; opacity:.5; pointer-events:none;
-  background-image: linear-gradient(var(--border-soft) 1px, transparent 1px), linear-gradient(90deg, var(--border-soft) 1px, transparent 1px);
-  background-size:28px 28px;
+/* Mobile visualization interaction: pinch any visualization with two fingers. */
+.viz-mobile-zoom-hint{
+  position:absolute; right:12px; top:7px; z-index:6;
+  padding:5px 9px; border:1px solid var(--border); border-radius:999px;
+  background:rgba(10,12,17,.72); color:var(--text-2); backdrop-filter:blur(8px);
+  font:700 8px var(--font-mono); letter-spacing:.05em; pointer-events:none;
+  white-space:nowrap; opacity:.9;
 }
+@media(max-width:700px){
+  .bars-viz{height:248px;}
+  .advanced-stage{min-height:220px;padding:8px 0;}
+  .circular-queue-wrap{padding-top:20px;padding-bottom:6px;}
+  .tree-viz-shell{gap:9px;}
+  .stack-mode-wrap{gap:20px;}
+  .adv-bars{height:285px;}
+  .grid-cell{width:36px;height:36px;}
+  .hash-slot{min-height:82px;}
+  .sq-box{width:76px;height:56px;font-size:17px;}
+  .queue-slot{min-height:54px;}
+  .pq-slot{min-width:46px;}
+  .tree-viz-shell{padding-top:12px;padding-bottom:18px;}
+  .tree-stage{padding-top:2px;padding-bottom:6px;}
+  .rec-wrap{padding-top:0;}
+}
+@media(prefers-reduced-motion:reduce){.viz-mobile-zoom-hint{display:none !important;}}
+
+.canvas-bg-grid{display:none !important;}
+.advanced-trace{display:none !important;}
+
+/* Live explanation + English voice assistant */
+#canvasArea{isolation:isolate;}
+.viz-live-explain{position:absolute;left:18px;right:18px;bottom:14px;z-index:8;display:flex;align-items:flex-start;justify-content:space-between;gap:16px;padding:13px 14px 13px 16px;border:1px solid var(--border);border-radius:15px;background:var(--panel);box-shadow:0 12px 28px rgba(0,0,0,.18);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);}
+.viz-live-main{min-width:0;pointer-events:none;max-height:76px;overflow:auto;padding-right:2px;}
+.viz-live-kicker{display:flex;align-items:center;gap:7px;font:800 9px var(--font-mono);letter-spacing:.12em;color:var(--accent-2);margin-bottom:5px;}
+.viz-live-dot{width:7px;height:7px;border-radius:50%;background:var(--op-sorted);animation:vizLivePulse 1.7s ease-in-out infinite;}
+@keyframes vizLivePulse{0%,100%{box-shadow:0 0 0 0 rgba(52,211,153,0)}50%{box-shadow:0 0 0 5px rgba(52,211,153,0)}}
+.viz-live-text{font-size:13px;line-height:1.45;color:var(--text-0);font-weight:600;}
+.viz-live-why{margin-top:4px;font-size:11px;line-height:1.45;color:var(--text-2);}
+.viz-live-why:empty{display:none;}
+.viz-voice-controls{display:flex;align-items:center;gap:8px;flex:0 0 auto;align-self:center;}
+.viz-voice-status{font:700 8px var(--font-mono);letter-spacing:.08em;color:var(--text-2);white-space:nowrap;}
+.viz-voice-btn{border:1px solid var(--border);background:var(--panel-strong);color:var(--text-0);border-radius:999px;padding:7px 10px;display:inline-flex;align-items:center;gap:6px;font:800 10px var(--font-mono);cursor:pointer;transition:.18s ease;}
+.viz-voice-btn:hover{transform:translateY(-1px);border-color:var(--accent);}
+.viz-voice-btn.muted{color:var(--text-2);}
+@media(max-width:700px){.viz-live-explain{left:10px;right:10px;bottom:10px;padding:10px 11px;gap:10px;}.viz-live-text{font-size:12px;}.viz-live-why{font-size:10.5px;}.viz-voice-status{display:none;}.viz-voice-btn{padding:7px 9px;}}
+@media(prefers-reduced-motion:reduce){.viz-live-dot{animation:none !important;}}
+
+/* Circular Queue: linear array with a visible last -> first connection. */
+.circular-queue-wrap{width:100%;max-width:650px;overflow-x:auto;overflow-y:hidden;padding:32px 6px 8px;box-sizing:border-box;}
+.circular-queue-inner{position:relative;width:max-content;min-width:600px;padding:0 8px;}
+.circular-queue-track{display:flex;align-items:flex-end;gap:8px;flex-wrap:nowrap;width:max-content;}
+.circular-queue-loop{position:absolute;left:8px;top:0;width:584px;height:34px;pointer-events:none;overflow:visible;}
+.circular-queue-loop path{fill:none;stroke:var(--accent-2);stroke-width:2.1;stroke-linecap:round;stroke-dasharray:6 5;opacity:.9;animation:cqFlow 1.8s linear infinite;}
+.circular-queue-loop marker path{stroke:none;fill:var(--accent-2);}
+@keyframes cqFlow{to{stroke-dashoffset:-22;}}
+.circular-queue-note{font:700 9px var(--font-mono);letter-spacing:.06em;color:var(--accent-2);text-align:center;margin-top:3px;}
+@media(max-width:700px){.circular-queue-wrap{max-width:calc(100vw - 48px);}.circular-queue-note{font-size:8px;}}
+@media(prefers-reduced-motion:reduce){.circular-queue-loop path{animation:none !important;}}
+
 .target-badge{
   position:absolute; top:16px; right:20px; z-index:5; display:flex; align-items:center; gap:7px;
   padding:6px 8px 6px 12px; border-radius:20px; border:1px solid var(--op-sorted); background:rgba(52,211,153,0.12);
@@ -879,7 +945,7 @@ select:focus, input:focus{ border-color:var(--accent); }
 }
 .bar-idx{ font-family:var(--font-mono); font-size:11px; color:var(--text-2); text-align:center; flex-shrink:0; line-height:1; }
 .bar{
-  width:100%; height:55%; border-radius:10px 10px 7px 7px;
+  width:82%; align-self:center; height:55%; border-radius:10px 10px 7px 7px;
   background:#3b3c43; border:1px solid rgba(255,255,255,.045);
   position:relative; display:flex; align-items:flex-start; justify-content:center; padding-top:10px;
   transition:height .32s cubic-bezier(.4,0,.2,1), transform .32s cubic-bezier(.4,0,.2,1), background .25s, border-color .25s, box-shadow .25s, opacity .2s, filter .2s;
@@ -913,7 +979,7 @@ select:focus, input:focus{ border-color:var(--accent); }
 }
 
 /* ---- Linked List visualization ---- */
-.list-viz{display:flex;align-items:center;justify-content:center;gap:18px;z-index:2;min-width:max-content;padding:34px 26px;position:relative;}
+.list-viz{display:flex;align-items:center;justify-content:center;gap:18px;z-index:2;min-width:max-content;padding:34px 26px;position:relative;--list-gesture-scale:1;transform:scale(var(--list-gesture-scale));transform-origin:center center;will-change:transform;touch-action:pan-x pan-y;}
 .list-node{display:flex;align-items:stretch;border:1px solid var(--border);background:var(--panel-strong);border-radius:14px;overflow:visible;min-width:120px;box-shadow:0 8px 24px rgba(0,0,0,.12);transition:.25s;position:relative;}
 .list-node .node-data{min-width:72px;padding:18px 12px;display:flex;align-items:center;justify-content:center;font:700 17px var(--font-mono);color:var(--text-0);}
 .list-node .node-ref{min-width:54px;padding:10px 7px;display:flex;align-items:center;justify-content:center;font:600 10px var(--font-mono);color:var(--accent-2);border-left:1px solid var(--border);}
@@ -928,6 +994,7 @@ select:focus, input:focus{ border-color:var(--accent); }
 .list-head-label{position:absolute;top:0;left:10px;font:700 11px var(--font-mono);color:var(--accent);}
 .list-tail-label{position:absolute;top:0;right:10px;font:700 11px var(--font-mono);color:var(--op-swap);}
 .list-cycle-line{position:absolute;left:50%;bottom:6px;transform:translateX(-50%);font:600 11px var(--font-mono);color:var(--accent-2);white-space:nowrap;}
+.list-gesture-hint{display:none;}
 
 /* ---- Stack visualizer upgrades ---- */
 .stack-mode-wrap{
@@ -1364,7 +1431,7 @@ select:focus, input:focus{ border-color:var(--accent); }
 
 
 /* ============================= TREES ============================= */
-.tree-viz-shell{display:flex;flex-direction:column;align-items:center;gap:12px;min-width:min(100%,760px);z-index:2;padding:22px 12px 28px;}
+.tree-viz-shell{display:flex;flex-direction:column;align-items:center;gap:10px;min-width:min(100%,760px);z-index:2;padding:16px 12px 18px;}
 .tree-viz-meta{display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap;}
 .tree-badge{padding:6px 11px;border-radius:999px;border:1px solid rgba(255,106,61,.25);background:rgba(255,106,61,.08);color:var(--accent);font:800 10px var(--font-mono);letter-spacing:.06em;text-transform:uppercase;}
 .tree-badge.alt{border-color:rgba(167,139,250,.3);background:rgba(167,139,250,.08);color:var(--op-pivot);}
@@ -2825,6 +2892,179 @@ body.ui-pointer-glow::before{
 }
 
 </style>
+
+<style id="adaptive-viz-layout-overrides">
+/* ================================================================
+   ADAPTIVE VISUALIZATION DISPLAY
+   Each visualization gets only the vertical space it actually needs.
+   Horizontal room/overflow is intentionally preserved for wide visuals.
+   The LIVE EXPLANATION is part of the display flow, never an overlay.
+================================================================ */
+.workspace:not(.fundamental-mode) .ws-canvas-card{
+  flex:0 0 auto;
+  min-height:0;
+}
+.workspace:not(.fundamental-mode) #canvasArea{
+  flex:0 0 auto;
+  min-height:0;
+  height:auto;
+  overflow-x:auto;
+  overflow-y:visible;
+  padding:8px 34px 14px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:flex-start;
+  gap:8px;
+  box-sizing:border-box;
+}
+.workspace:not(.fundamental-mode) #canvasContent{
+  flex:0 0 auto;
+  width:100%;
+  min-height:0;
+  margin:0 auto;
+}
+.workspace:not(.fundamental-mode) .viz-live-explain{
+  position:relative;
+  left:auto;
+  right:auto;
+  bottom:auto;
+  width:calc(100% - 24px);
+  margin:2px 12px 2px;
+  flex:0 0 auto;
+  box-sizing:border-box;
+}
+.workspace:not(.fundamental-mode) .viz-mobile-zoom-hint{
+  position:absolute;
+  top:6px;
+  right:12px;
+}
+
+/* Remove decorative vertical air from compact visual families without
+   changing their sideways geometry. */
+.workspace:not(.fundamental-mode) #canvasContent > .list-viz{
+  padding-top:18px;
+  padding-bottom:20px;
+}
+.workspace:not(.fundamental-mode) #canvasContent > .stack-mode-wrap{
+  padding-top:6px;
+  padding-bottom:8px;
+}
+.workspace:not(.fundamental-mode) #canvasContent > .queue-mode-wrap{
+  padding-top:6px;
+  padding-bottom:8px;
+}
+.workspace:not(.fundamental-mode) #canvasContent > .rec-wrap{
+  padding-top:2px;
+  padding-bottom:8px;
+}
+.workspace:not(.fundamental-mode) #canvasContent > .tree-viz-shell{
+  padding-top:8px;
+  padding-bottom:12px;
+}
+.workspace:not(.fundamental-mode) #canvasContent > .advanced-viz-shell{
+  padding-top:4px;
+  padding-bottom:8px;
+}
+.workspace:not(.fundamental-mode) #canvasContent > .bars-viz{
+  margin:0 auto;
+  padding-top:4px;
+  padding-bottom:6px;
+}
+
+/* Give compact structures a readable minimum visual footprint, but never
+   force tall structures into a fixed-height box. */
+@media (min-width:701px){
+  #canvasArea[data-viz-type="list"],
+  #canvasArea[data-viz-type="stack"],
+  #canvasArea[data-viz-type="queue"],
+  #canvasArea[data-viz-type="tree"]{
+    --viz-compact-min:84px;
+  }
+}
+@media (max-width:700px){
+  .workspace:not(.fundamental-mode) #canvasArea{
+    padding:6px 14px 10px;
+    gap:6px;
+  }
+  .workspace:not(.fundamental-mode) .viz-live-explain{
+    width:calc(100% - 12px);
+    margin:2px 6px 2px;
+  }
+  .workspace:not(.fundamental-mode) #canvasContent > .list-viz{
+    padding-top:12px;
+    padding-bottom:14px;
+  }
+  .workspace:not(.fundamental-mode) #canvasContent > .stack-mode-wrap,
+  .workspace:not(.fundamental-mode) #canvasContent > .queue-mode-wrap,
+  .workspace:not(.fundamental-mode) #canvasContent > .advanced-viz-shell,
+  .workspace:not(.fundamental-mode) #canvasContent > .rec-wrap{
+    padding-top:2px;
+    padding-bottom:6px;
+  }
+  .workspace:not(.fundamental-mode) #canvasContent > .tree-viz-shell{
+    padding-top:4px;
+    padding-bottom:8px;
+  }
+  .workspace:not(.fundamental-mode) #canvasContent > .bars-viz{
+    padding-top:2px;
+    padding-bottom:4px;
+  }
+}
+
+/* Prevent the live explanation from ever covering the visualization.
+   It lives in normal document flow below the visualization display. */
+.workspace:not(.fundamental-mode) .ws-canvas-card{
+  display:flex;
+  flex-direction:column;
+  flex:0 0 auto;
+  min-height:0;
+  height:auto;
+}
+.workspace:not(.fundamental-mode) #canvasArea{
+  flex:0 0 auto;
+  min-height:0;
+  height:auto;
+  padding:8px 34px 10px;
+}
+.workspace:not(.fundamental-mode) #canvasContent{
+  flex:0 0 auto;
+  transform-origin:center top;
+}
+.workspace:not(.fundamental-mode) .viz-live-explain{
+  position:relative !important;
+  inset:auto !important;
+  width:calc(100% - 24px);
+  margin:4px 12px 10px;
+  order:2;
+}
+@media(max-width:700px){
+  .workspace:not(.fundamental-mode) #canvasArea{
+    padding:6px 14px 8px;
+  }
+  .workspace:not(.fundamental-mode) .viz-live-explain{
+    width:calc(100% - 12px);
+    margin:4px 6px 8px;
+  }
+}
+
+/* Natural voice-control treatment. */
+.viz-voice-btn{min-width:78px;justify-content:center;}
+.viz-live-text{max-width:72ch;}
+.viz-live-why{max-width:76ch;}
+
+/* Tree details are intentionally kept outside #canvasContent so mobile zoom
+   affects only the actual tree visualization, not the explanation/overview. */
+.workspace:not(.fundamental-mode) .viz-live-explain{order:1;}
+.tree-details{width:min(760px,calc(100% - 24px));margin:0 auto 6px;display:flex;flex-direction:column;align-items:center;gap:8px;box-sizing:border-box;order:2;}
+.tree-details .tree-order-panel,.tree-details .tree-theory-strip,.tree-details .tree-legend{width:100%;}
+.tree-details .tree-theory-strip{max-width:760px;}
+.tree-details .tree-legend{max-width:760px;}
+@media(max-width:700px){
+  .tree-details{width:calc(100% - 12px);gap:7px;margin:0 auto 4px;}
+}
+</style>
+
 </head>
 <body>
 
@@ -3386,6 +3626,18 @@ body.ui-pointer-glow::before{
             <div id="canvasArea">
               <div class="canvas-bg-grid"></div>
               <div id="canvasContent"></div>
+              <div class="viz-mobile-zoom-hint" id="vizMobileZoomHint">PINCH WITH TWO FINGERS TO ZOOM</div>
+            </div>
+            <div class="viz-live-explain" id="vizLiveExplain" aria-live="polite">
+              <div class="viz-live-main">
+                <div class="viz-live-kicker"><span class="viz-live-dot"></span> LIVE EXPLANATION</div>
+                <div class="viz-live-text" id="vizLiveText">Choose a DSA topic, then press Next or Play to follow each step here.</div>
+                <div class="viz-live-why" id="vizLiveWhy"></div>
+              </div>
+              <div class="viz-voice-controls">
+                <span class="viz-voice-status" id="vizVoiceStatus">ENGLISH VOICE</span>
+                <button class="viz-voice-btn" id="vizVoiceMute" type="button" aria-pressed="false" title="Mute voice assistant">🔊 <span>Mute</span></button>
+              </div>
             </div>
           </div>
 
@@ -3409,7 +3661,6 @@ body.ui-pointer-glow::before{
                 <button class="speed-pill" data-speed="1">0.5x</button>
                 <button class="speed-pill active" data-speed="2">1x</button>
                 <button class="speed-pill" data-speed="3">2x</button>
-                <button class="speed-pill" data-speed="4">4x</button>
               </div>
             </div>
           </div>
@@ -6528,9 +6779,77 @@ function genBinarySearch(a, target){
 ====================================================================== */
 const State = {
   algo:null, data:[], steps:[], stepIdx:-1, playing:false, timer:null,
-  speedMs:600, mode:'visualize', target:null, sortedArr:null, sideTab:'explain',
+  speedMs:2800, mode:'visualize', target:null, sortedArr:null, sideTab:'explain',
   rangeMin:1, rangeMax:100, allowDup:true, filterKey:null
 };
+
+/* ---------------- LIVE DISPLAY EXPLANATION + ENGLISH VOICE ---------------- */
+let voiceMuted = false;
+try { voiceMuted = localStorage.getItem('dsa-voice-muted') === 'true'; } catch(e) {}
+
+function syncVoiceAssistantUI(){
+  const btn=document.getElementById('vizVoiceMute');
+  const status=document.getElementById('vizVoiceStatus');
+  if(!btn) return;
+  const supported='speechSynthesis' in window && 'SpeechSynthesisUtterance' in window;
+  btn.disabled=!supported;
+  if(!supported){
+    btn.classList.add('muted');
+    btn.innerHTML='🔇 <span>Unavailable</span>';
+    btn.title='Voice assistant is not supported by this browser';
+    if(status) status.textContent='VOICE UNAVAILABLE';
+    return;
+  }
+  btn.classList.toggle('muted',voiceMuted);
+  btn.setAttribute('aria-pressed',voiceMuted?'true':'false');
+  btn.innerHTML=voiceMuted?'🔇 <span>Unmute</span>':'🔊 <span>Mute</span>';
+  btn.title=voiceMuted?'Unmute voice assistant':'Mute voice assistant';
+  if(status) status.textContent=voiceMuted?'VOICE MUTED':'ENGLISH VOICE';
+}
+
+function speakVisualizationStep(step, onDone){
+  const done=typeof onDone==='function' ? onDone : ()=>{};
+  if(!step || voiceMuted || !('speechSynthesis' in window) || !('SpeechSynthesisUtterance' in window)){
+    done();
+    return;
+  }
+  const textParts=[];
+  if(step.op && step.op!=='READY') textParts.push(`${step.op}.`);
+  if(step.explain) textParts.push(step.explain);
+  const utterance=new SpeechSynthesisUtterance(textParts.join(' '));
+  utterance.lang='en-US'; utterance.rate=.88; utterance.pitch=1; utterance.volume=1;
+  const voices=window.speechSynthesis.getVoices();
+  const english=voices.find(v=>/^en[-_]/i.test(v.lang));
+  if(english) utterance.voice=english;
+  let finished=false;
+  const finish=()=>{ if(finished) return; finished=true; done(); };
+  utterance.onend=finish;
+  utterance.onerror=finish;
+  window.speechSynthesis.cancel();
+  window.speechSynthesis.speak(utterance);
+}
+
+function updateLiveVisualization(step, speakNow=false){
+  const text=document.getElementById('vizLiveText');
+  const why=document.getElementById('vizLiveWhy');
+  if(!text) return;
+  const fallback=State.algo ? 'Press Next or Play to follow the visualization step by step.' : 'Choose a DSA topic, then press Next or Play to follow each step here.';
+  text.textContent=step?.explain || fallback;
+  why.textContent=step?.why ? `Why it matters: ${step.why}` : '';
+  if(speakNow) speakVisualizationStep(step);
+}
+
+(function initVoiceAssistant(){
+  const btn=document.getElementById('vizVoiceMute');
+  btn?.addEventListener('click',()=>{
+    voiceMuted=!voiceMuted;
+    try{localStorage.setItem('dsa-voice-muted',String(voiceMuted));}catch(e){}
+    if(voiceMuted && 'speechSynthesis' in window) window.speechSynthesis.cancel();
+    syncVoiceAssistantUI();
+  });
+  syncVoiceAssistantUI();
+})();
+
 
 
 let treeIdSeed = 0;
@@ -6616,7 +6935,13 @@ function treeLayout(root){
   const pos=new Map(nodes.map((x,i)=>[x.node.id,{x:40+i*gap,y:48+x.depth*92,depth:x.depth}]));
   return {nodes,pos,width,height:Math.max(180,(maxDepth+1)*92+90)};
 }
-function treeSnapshotFor(step){ return step?.root ? step.root : (treeDisplayRoot || treeRoot); }
+function treeSnapshotFor(step){
+  if(step?.root) return step.root;
+  // When an operation has just finished, stepIdx == -1 is the replay/start state.
+  // Show the pre-operation tree there so Previous/Play can replay the exact operation.
+  if(treeOperation && State.stepIdx<0 && treeOperation.base) return treeOperation.base;
+  return treeDisplayRoot || treeRoot;
+}
 function treeCurrentStructure(){ return TREE_STRUCTURE_ALGOS.includes(State.algo) ? State.algo : treeActiveStructure; }
 
 function randArray(size=10, min=1, max=100){
@@ -6789,32 +7114,94 @@ function fitMobileVisualization(){
     if(!root || !document.body) return;
     if(window.innerWidth > 700){
       root.style.zoom = '';
-      root.style.removeProperty('--mobile-viz-scale');
       root.removeAttribute('data-mobile-zoom');
+      root.style.setProperty('--viz-gesture-scale','1');
       return;
     }
 
-    /* Tree visualizations have their own SVG-only mobile fitting so that the
-       explanatory text below never gets scaled with the tree. Advanced AVL/tree
-       demos use the same .tree-stage, so they follow the same isolated behavior. */
-    const isolatedTree = TREE_ALGOS.includes(State.algo) || !!root.querySelector('.tree-stage, #advancedStage .tree-stage');
-    if(isolatedTree){
-      root.style.zoom = '';
-      root.style.removeProperty('--mobile-viz-scale');
-      root.removeAttribute('data-mobile-zoom');
-      return;
-    }
-
-    /* Measure the original rendered geometry, not the already-scaled geometry. */
+    /* Measure the base visualization before applying the user's pinch scale.
+       The live explanation is outside #canvasContent, so it is never scaled. */
     root.style.zoom = '1';
-    const available = Math.max(1, root.clientWidth || root.parentElement?.clientWidth || window.innerWidth - 28);
+    const isLinkedList = Array.isArray(LIST_ALGOS) && LIST_ALGOS.includes(State.algo);
+    const isTreeVisualization = !!root.querySelector('.tree-stage, .advanced-stage .tree-stage');
+    const activeGestureScale = (isLinkedList || isTreeVisualization) ? 1 : vizGestureScale;
+    root.style.setProperty('--viz-gesture-scale', String(activeGestureScale));
+    const hint=document.getElementById('vizMobileZoomHint');
+    if(hint){
+      hint.style.display = isLinkedList ? 'none' : 'block';
+    }
+    const available = Math.max(1, (root.parentElement?.clientWidth || window.innerWidth) - 4);
     const renderedWidth = Math.max(1, root.scrollWidth);
-    const scale = Math.max(0.42, Math.min(1, available / renderedWidth));
+    const desired = available / renderedWidth;
+    const scale = Math.min(1, Math.max(.58, desired));
     root.style.zoom = String(scale);
-    root.style.setProperty('--mobile-viz-scale', String(scale));
     root.dataset.mobileZoom = scale.toFixed(3);
+    root.style.setProperty('--viz-gesture-scale', String(activeGestureScale));
   });
 }
+
+let vizGestureScale = window.innerWidth <= 700 ? 1.08 : 1;
+(function initMobileVisualizationGesture(){
+  const root = document.getElementById('canvasContent');
+  if(!root) return;
+  let startDistance = 0;
+  let startScale = vizGestureScale;
+  const distance=(a,b)=>Math.hypot(a.clientX-b.clientX,a.clientY-b.clientY);
+  const isLinkedListTarget=(target)=>!!target?.closest?.('#listViz');
+
+  const syncScale=()=>{
+    const isLinkedList = Array.isArray(LIST_ALGOS) && LIST_ALGOS.includes(State.algo);
+    const isTreeVisualization = !!root.querySelector('.tree-stage, .advanced-stage .tree-stage');
+    root.style.setProperty('--viz-gesture-scale', ((isLinkedList || isTreeVisualization) ? 1 : vizGestureScale).toFixed(3));
+    const hint=document.getElementById('vizMobileZoomHint');
+    if(hint){
+      hint.textContent = window.innerWidth <= 700 ? 'PINCH WITH TWO FINGERS TO ZOOM' : '';
+      hint.style.display = (window.innerWidth <= 700 && !isLinkedList) ? 'block' : 'none';
+    }
+    fitMobileVisualization();
+  };
+
+  root.addEventListener('touchstart',e=>{
+    if(window.innerWidth>700 || isLinkedListTarget(e.target) || e.touches.length!==2) return;
+    startDistance=distance(e.touches[0],e.touches[1]);
+    startScale=vizGestureScale;
+  },{passive:true});
+
+  root.addEventListener('touchmove',e=>{
+    if(window.innerWidth>700 || isLinkedListTarget(e.target) || e.touches.length!==2 || !startDistance) return;
+    e.preventDefault();
+    const ratio=distance(e.touches[0],e.touches[1])/startDistance;
+    vizGestureScale=Math.min(1.8,Math.max(.72,startScale*ratio));
+    root.style.setProperty('--viz-gesture-scale',vizGestureScale.toFixed(3));
+  },{passive:false});
+
+  const end=()=>{
+    if(!startDistance) return;
+    startDistance=0;
+    startScale=vizGestureScale;
+    fitMobileVisualization();
+  };
+  root.addEventListener('touchend',end,{passive:true});
+  root.addEventListener('touchcancel',end,{passive:true});
+
+  window.addEventListener('resize',()=>{
+    if(window.innerWidth>700){
+      vizGestureScale=1;
+      root.style.setProperty('--viz-gesture-scale','1');
+      return;
+    }
+    if(!vizGestureScale || vizGestureScale===1) vizGestureScale=1.08;
+    const isLinkedList=Array.isArray(LIST_ALGOS) && LIST_ALGOS.includes(State.algo);
+    const isTreeVisualization=!!root.querySelector('.tree-stage, .advanced-stage .tree-stage');
+    root.style.setProperty('--viz-gesture-scale',((isLinkedList || isTreeVisualization) ? 1 : vizGestureScale).toFixed(3));
+  },{passive:true});
+
+  syncScale();
+  setTimeout(()=>{
+    const hint=document.getElementById('vizMobileZoomHint');
+    if(hint && window.innerWidth<=700) hint.style.opacity='0';
+  },3600);
+})();
 
 (function initMobileVisualizationFit(){
   const root = document.getElementById('canvasContent');
@@ -6831,6 +7218,7 @@ function fitMobileVisualization(){
 })();
 
 function renderCanvasBase(){
+  cleanupTreeDisplayDetails();
   const el = document.getElementById('canvasContent');
   el.innerHTML='';
   if(LIST_ALGOS.includes(State.algo)){ renderLinkedListCanvas(); return; }
@@ -6898,6 +7286,8 @@ function renderStep(){
       applyPersistentState(st, s===State.stepIdx);
     }
   }
+  const liveStep = State.stepIdx>=0 ? State.steps[State.stepIdx] : State.steps[0];
+  updateLiveVisualization(liveStep);
   updateSidePanel();
   updateStepUI();
 }
@@ -6954,11 +7344,6 @@ function updateSidePanel(){
           <div class="panel-subtitle">${st ? escapeHtml(st.explain) : (isList ? 'Press play or step forward to watch the nodes update one operation at a time.' : 'Press play or step forward to begin execution.')}</div>
         </div>
         <span class="panel-status">${st ? escapeHtml(st.op) : 'READY'}</span>
-      </div>
-      <div class="panel-block">
-        <h4>What is happening?</h4>
-        <div class="explain-text">${st ? escapeHtml(st.explain) : 'The visualizer is ready. Start playback to follow the algorithm or data structure step by step.'}</div>
-        ${st ? `<div class="panel-callout"><b>Why this step matters:</b> ${escapeHtml(st.why || 'This step changes the current state and moves the algorithm closer to completion.')}</div>` : `<div class="panel-callout"><b>Tip:</b> Use Next to study at your own pace, or Play to see the complete flow automatically.</div>`}
       </div>
       <div class="panel-metrics">
         <div class="panel-metric"><div class="label">${isList?'Current node':'Elements touched'}</div><div class="value">${isList ? (st?.idx?.length ? '#'+st.idx[0] : '—') : touched}</div></div>
@@ -7215,12 +7600,13 @@ function stepForward(){
   if(State.stepIdx < State.steps.length-1){
     State.stepIdx++;
     renderStep();
+    updateLiveVisualization(State.steps[State.stepIdx], true);
   } else {
     pausePlayback();
   }
 }
 function stepBack(){
-  if(State.stepIdx > -1){ State.stepIdx--; renderStep(); }
+  if(State.stepIdx > -1){ State.stepIdx--; renderStep(); updateLiveVisualization(State.steps[State.stepIdx], true); }
 }
 function restart(){
   State.stepIdx=-1;
@@ -7259,16 +7645,49 @@ function restart(){
   renderCanvasBase();
   renderStep();
 }
+let playbackRunId=0;
 function playPlayback(){
   if(State.steps.length===0){ toast('Select a ready algorithm first.', 'error'); return; }
-  State.playing=true; updateStepUI();
-  clearInterval(State.timer);
-  State.timer=setInterval(()=>{
+  // A completed tree operation is shown immediately. Pressing Play replays that
+  // operation from its original tree instead of doing nothing at the final step.
+  if(TREE_ALGOS.includes(State.algo) && treeOperation && State.stepIdx>=State.steps.length-1){
+    treeDisplayRoot=cloneTree(treeOperation.base);
+    State.stepIdx=-1;
+    renderTreeCanvas();
+    renderTreeStep();
+  }
+  State.playing=true;
+  const runId=++playbackRunId;
+  clearTimeout(State.timer);
+
+  const advance=()=>{
+    if(!State.playing || runId!==playbackRunId) return;
     if(State.stepIdx>=State.steps.length-1){ pausePlayback(); return; }
-    stepForward();
-  }, State.speedMs);
+
+    State.stepIdx++;
+    renderStep();
+    const step=State.steps[State.stepIdx];
+    const started=performance.now();
+    const waitForVoice=()=>{
+      if(!State.playing || runId!==playbackRunId) return;
+      const elapsed=performance.now()-started;
+      const remaining=Math.max(0, State.speedMs-elapsed);
+      State.timer=setTimeout(advance, remaining);
+    };
+    speakVisualizationStep(step, waitForVoice);
+    updateStepUI();
+  };
+
+  advance();
 }
-function pausePlayback(){ State.playing=false; clearInterval(State.timer); updateStepUI(); }
+function pausePlayback(){
+  State.playing=false;
+  playbackRunId++;
+  clearTimeout(State.timer);
+  State.timer=null;
+  if('speechSynthesis' in window) window.speechSynthesis.cancel();
+  updateStepUI();
+}
 
 document.getElementById('btnPlay').addEventListener('click', ()=> State.playing ? pausePlayback() : playPlayback());
 document.getElementById('btnNext').addEventListener('click', ()=>{ pausePlayback(); stepForward(); });
@@ -7292,8 +7711,9 @@ document.getElementById('progressTrack').addEventListener('click', (e)=>{
   State.stepIdx = Math.round(pct*(State.steps.length))-1;
   State.stepIdx = Math.max(-1, Math.min(State.steps.length-1, State.stepIdx));
   pausePlayback(); renderStep();
+  updateLiveVisualization(State.stepIdx>=0 ? State.steps[State.stepIdx] : State.steps[0]);
 });
-const speedMap = {0:1600,1:900,2:600,3:300,4:150};
+const speedMap = {0:5200,1:3800,2:2800,3:1800};
 document.querySelectorAll('.speed-pill').forEach(b=>{
   b.addEventListener('click', ()=>{
     document.querySelectorAll('.speed-pill').forEach(x=>x.classList.remove('active'));
@@ -7572,7 +7992,7 @@ function renderInputPanel(){
       </div>
       <div class="panel-block">
         <h4>Node values</h4>
-        <div class="input-card"><label for="panelListInput">Comma-separated values</label><input type="text" id="panelListInput" value="${escapeHtml(State.data.join(', '))}" placeholder="10, 20, 30, 40" style="width:100%"></div>
+        <div class="input-card"><label for="panelListInput">Comma-separated values</label><input type="text" id="panelListInput" value="${escapeHtml(State.data.join(', '))}" placeholder="10, 20, 30" style="width:100%"></div>
         <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px">
           <button class="btn btn-primary btn-sm" id="panelApplyList">✓ Apply values</button>
           <button class="btn btn-ghost btn-sm" id="panelResetList">↺ Reset sample</button>
@@ -7597,7 +8017,7 @@ function renderInputPanel(){
     document.getElementById('panelApplyList')?.addEventListener('click',apply);
     document.getElementById('panelListInput')?.addEventListener('keydown',e=>{if(e.key==='Enter')apply();});
     document.getElementById('panelResetList')?.addEventListener('click',()=>{
-      State.data=[10,20,30,40]; buildSteps(); renderLinkedListCanvas(); renderLinkedListStep(); toast('Sample input restored.');
+      State.data=[10,20,30]; buildSteps(); renderLinkedListCanvas(); renderLinkedListStep(); toast('Sample input restored.');
     });
     body.querySelectorAll('[data-preset]').forEach(btn=>btn.addEventListener('click',()=>{
       document.getElementById('panelListInput').value=btn.dataset.preset;
@@ -7641,6 +8061,7 @@ function genLinkedListSteps(kind, data){
   return {steps};
 }
 function renderLinkedListCanvas(){
+  cleanupTreeDisplayDetails();
   const el=document.getElementById('canvasContent');
   el.innerHTML='';
   const wrap=document.createElement('div'); wrap.className='list-viz'; wrap.id='listViz';
@@ -7662,14 +8083,39 @@ function renderLinkedListCanvas(){
   });
   const tail=document.createElement('div'); tail.className='list-tail-label'; tail.textContent=kind==='cll'?'TAIL → HEAD':'TAIL'; wrap.appendChild(tail);
   if(kind==='cll'){ const c=document.createElement('div'); c.className='list-cycle-line'; c.textContent='↻  last.next → head  •  cycle'; wrap.appendChild(c); }
+  const hint=document.createElement('div'); hint.className='list-gesture-hint'; hint.textContent='Pinch with two fingers to zoom'; wrap.appendChild(hint);
+  linkedListZoom = window.innerWidth <= 700 ? 1.15 : 1;
+  wrap.style.setProperty('--list-gesture-scale', linkedListZoom.toFixed(2));
   el.appendChild(wrap);
+  setupLinkedListPinch(wrap);
+}
+let linkedListZoom=1;
+function setupLinkedListPinch(wrap){
+  if(!wrap) return;
+  let startDistance=0;
+  let startZoom=linkedListZoom;
+  const distance=(a,b)=>Math.hypot(a.clientX-b.clientX,a.clientY-b.clientY);
+  wrap.addEventListener('touchstart',e=>{
+    if(e.touches.length!==2) return;
+    startDistance=distance(e.touches[0],e.touches[1]);
+    startZoom=linkedListZoom;
+  },{passive:true});
+  wrap.addEventListener('touchmove',e=>{
+    if(e.touches.length!==2 || !startDistance) return;
+    e.preventDefault();
+    linkedListZoom=Math.min(2.2,Math.max(.8,startZoom*(distance(e.touches[0],e.touches[1])/startDistance)));
+    wrap.style.setProperty('--list-gesture-scale',linkedListZoom.toFixed(2));
+  },{passive:false});
+  const end=()=>{startDistance=0;startZoom=linkedListZoom;};
+  wrap.addEventListener('touchend',end,{passive:true});
+  wrap.addEventListener('touchcancel',end,{passive:true});
 }
 function setListState(i,state){ const el=document.querySelector(`#listViz .list-node[data-index="${i}"]`); if(el) el.dataset.state=state; }
 function renderLinkedListStep(){
   if(!LIST_ALGOS.includes(State.algo)) return;
   document.querySelectorAll('#listViz .list-node').forEach(n=>n.dataset.state='normal');
   for(let s=0;s<=State.stepIdx;s++){ const st=State.steps[s]; if(st.type==='visit-node') setListState(st.idx[0], s===State.stepIdx?'current':'visited'); }
-  updateSidePanel(); updateStepUI();
+  const step=State.stepIdx>=0?State.steps[State.stepIdx]:State.steps[0]; updateLiveVisualization(step); updateSidePanel(); updateStepUI();
 }
 function renderLinkedListControls(){
   const el=document.getElementById('wsControlsRow');
@@ -7688,7 +8134,7 @@ function renderLinkedListControls(){
 function selectLinkedList(key){
   pausePlayback(); resetFilter();
   document.querySelector('#view-workspace .workspace')?.classList.remove('fundamental-mode');
-  State.algo=key; State.data=randArray(6,10,99); State.target=null; State.sideTab='explain';
+  State.algo=key; State.data=randArray(3,10,99); State.target=null; State.sideTab='explain';
   const meta=DS_CATALOG[key];
   document.getElementById('wsTitle').textContent=meta.name;
   document.getElementById('wsControlsRow').style.display='flex';
@@ -7718,6 +8164,7 @@ function genStackSteps(kind, data){
   return {steps};
 }
 function renderStackCanvas(){
+  cleanupTreeDisplayDetails();
   const el=document.getElementById('canvasContent');
   el.innerHTML='';
   const kind=State.algo==='stack'?'array':'linked';
@@ -7754,7 +8201,7 @@ function renderStackStep(){
   const step=State.stepIdx>=0?State.steps[State.stepIdx]:State.steps[0];
   const snapshot=step?.snapshot?[...step.snapshot]:[...State.data];
   renderStackSnapshot(snapshot, step);
-  updateSidePanel();
+  updateLiveVisualization(step); updateSidePanel();
   updateStepUI();
 }
 function renderStackSnapshot(snapshot, step){
@@ -8153,10 +8600,11 @@ function renderRecStep(){
   if(!REC_ALGOS.includes(State.algo) && !PQ_ALGOS.includes(State.algo)) return;
   const step = State.stepIdx>=0 ? State.steps[State.stepIdx] : State.steps[0];
   renderRecSnapshot(step);
-  updateSidePanel();
+  updateLiveVisualization(step); updateSidePanel();
   updateStepUI();
 }
 function renderRecSnapshot(step){
+  cleanupTreeDisplayDetails();
   const el=document.getElementById('canvasContent');
   el.innerHTML='';
   const wrap=document.createElement('div');
@@ -8562,10 +9010,11 @@ function renderQueueStep(){
   const step = State.stepIdx>=0 ? State.steps[State.stepIdx] : State.steps[0];
   const snapshot = step?.snapshot || queueSnapshotFor(State.algo, State.data, queueFrontStart);
   renderQueueSnapshot(snapshot, step);
-  updateSidePanel();
+  updateLiveVisualization(step); updateSidePanel();
   updateStepUI();
 }
 function renderQueueSnapshot(snapshot, step){
+  cleanupTreeDisplayDetails();
   const el = document.getElementById('canvasContent');
   const kind = State.algo;
   el.innerHTML='';
@@ -8592,7 +9041,8 @@ function renderQueueSnapshot(snapshot, step){
   wrap.appendChild(bar);
 
   if(kind==='queue-linked') wrap.appendChild(buildLinkedQueueTrack(snapshot, step));
-  else if(kind==='queue-circular') wrap.appendChild(buildRingTrack(snapshot, step));
+  else if(kind==='queue-circular') wrap.appendChild(buildCircularQueueTrack(snapshot, step));
+  else if(kind==='deque') wrap.appendChild(buildDequeRingTrack(snapshot, step));
   else wrap.appendChild(buildLinearTrack(snapshot, step));
 
   const flow = document.createElement('div');
@@ -8629,7 +9079,41 @@ function buildLinearTrack(snapshot, step){
   });
   return track;
 }
-function buildRingTrack(snapshot, step){
+function buildCircularQueueTrack(snapshot, step){
+  const outer=document.createElement('div');
+  outer.className='circular-queue-wrap';
+  const inner=document.createElement('div');
+  inner.className='circular-queue-inner';
+  const track=document.createElement('div');
+  track.className='circular-queue-track';
+  snapshot.slots.forEach((v,i)=>{
+    const cell=document.createElement('div');
+    cell.className='queue-cell';
+    let tag='',tagCls='';
+    const isFront=snapshot.count && i===snapshot.front;
+    const isRear=snapshot.count && i===snapshot.rear;
+    if(isFront && isRear){tag='F+R';tagCls=' both';}
+    else if(isFront){tag='FRONT';}
+    else if(isRear){tag='REAR';tagCls=' rear';}
+    cell.innerHTML=`<div class="queue-ptr-tag${tagCls}">${tag}</div><div class="queue-slot${v===null?' empty':''}${stateClassFor(step,i)}">${v===null?'—':v}</div><div class="queue-idx">${i}</div>`;
+    track.appendChild(cell);
+  });
+  inner.appendChild(track);
+  const svg=document.createElementNS('http://www.w3.org/2000/svg','svg');
+  svg.setAttribute('class','circular-queue-loop');
+  svg.setAttribute('viewBox','0 0 584 34');
+  svg.setAttribute('aria-hidden','true');
+  svg.innerHTML='<defs><marker id="cqArrow" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto"><path d="M0,0 L7,3.5 L0,7 Z"></path></marker></defs><path d="M550 29 C550 5 34 5 34 29" marker-end="url(#cqArrow)"></path>';
+  inner.appendChild(svg);
+  const note=document.createElement('div');
+  note.className='circular-queue-note';
+  note.textContent=`Linear array view • rear wraps to index 0 • capacity ${snapshot.capacity}`;
+  inner.appendChild(note);
+  outer.appendChild(inner);
+  return outer;
+}
+
+function buildDequeRingTrack(snapshot, step){
   const ring = document.createElement('div');
   ring.className='queue-ring';
   const cap = snapshot.capacity, R = 112, cx = 150, cy = 150;
@@ -8929,8 +9413,19 @@ function runTreeOperation(action,value){
   const kind=treeCurrentStructure();
   const base=cloneTree(treeRoot||treeSampleRoot(kind));
   const result=kind==='bst'?genBSTOperationSteps(action,value,base):genBinaryTreeOperationSteps(action,value,base);
-  treeInitialRoot=base; treeDisplayRoot=base; treeRoot=cloneTree(result.final); treeOperation={action,value,base,final:cloneTree(result.final)};
-  State.data=treeValues(treeRoot); State.steps=result.steps.length?result.steps:[treeReadyStep(base)]; State.stepIdx=-1; pausePlayback(); renderTreeCanvas(); renderTreeStep(); renderTreeControls();
+  treeInitialRoot=cloneTree(base);
+  treeRoot=cloneTree(result.final);
+  treeDisplayRoot=cloneTree(result.final);
+  treeOperation={action,value,base:cloneTree(base),final:cloneTree(result.final)};
+  State.data=treeValues(treeRoot);
+  State.steps=result.steps.length?result.steps:[treeReadyStep(base)];
+  // Show the operation result immediately. This prevents the old two-click
+  // behavior where the toast announced the change but the canvas still showed base.
+  State.stepIdx=Math.max(0,State.steps.length-1);
+  pausePlayback();
+  renderTreeCanvas();
+  renderTreeStep();
+  renderTreeControls();
   if(action==='search') toast(result.steps.some(x=>x.op==='FOUND')?`Found ${value}.`:`${value} was not found.`,result.steps.some(x=>x.op==='FOUND')?'info':'error');
   else if(action==='insert') toast(result.duplicate?`${value} already exists.`:`Inserted ${value}.`,'info');
   else toast(result.steps.some(x=>x.op==='NOT FOUND')?`${value} was not found.`:`Deleted ${value}.`,'info');
@@ -9021,17 +9516,48 @@ function renderTreeControls(){
     document.getElementById('treeResetBtn').onclick=()=>{treeRoot=treeSampleRoot(treeActiveStructure,treeNodeCountTarget);treeInitialRoot=cloneTree(treeRoot);treeDisplayRoot=cloneTree(treeRoot);State.data=treeValues(treeRoot);buildSteps();renderTreeCanvas();renderTreeStep();toast('Sample tree restored.');};
   }
 }
-function renderTreeCanvas(){
-  const el=document.getElementById('canvasContent'); if(!el)return; el.innerHTML='';
-  const root=treeDisplayRoot||treeRoot||treeSampleRoot(treeActiveStructure);
-  const shell=document.createElement('div'); shell.className='tree-viz-shell'; shell.id='treeVizShell';
-  const meta=document.createElement('div'); meta.className='tree-viz-meta'; meta.innerHTML=`<span class="tree-badge">${treeCurrentStructure()==='bst'?'BINARY SEARCH TREE':'BINARY TREE'}</span><span class="tree-badge neutral">${treeNodeCount(root)} nodes · height ${Math.max(0,treeHeight(root)-1)}</span>`; shell.appendChild(meta);
-  const stage=document.createElement('div'); stage.className='tree-stage'; stage.id='treeStage'; shell.appendChild(stage);
-  const orderPanel=document.createElement('div'); orderPanel.className='tree-order-panel'; orderPanel.innerHTML=`<div class="tree-order-title">${TREE_TRAVERSAL_ALGOS.includes(State.algo)?traversalLabel(treeTraversalOrder)+' result':'Tree overview'}</div><div class="tree-order-list" id="treeOrderList"><span style="color:var(--text-2);font-size:11px">Use Play / Next to trace the tree.</span></div><div class="tree-stack-view" id="treeStackView"></div>`; shell.appendChild(orderPanel);
-  const theory=document.createElement('div'); theory.className='tree-theory-strip'; theory.innerHTML=`<div class="tree-theory-pill"><b>ROOT</b><span>${root?root.value:'∅'} is the starting node.</span></div><div class="tree-theory-pill"><b>HEIGHT</b><span>${Math.max(0,treeHeight(root)-1)} edge${Math.max(0,treeHeight(root)-1)===1?'':'s'} on the deepest root-to-leaf path.</span></div><div class="tree-theory-pill"><b>TRAVERSAL</b><span>Every traversal visits each node once → O(n).</span></div>`; shell.appendChild(theory);
-  const legend=document.createElement('div'); legend.className='tree-legend'; legend.innerHTML='<span><i class="current"></i>Current</span><span><i class="visited"></i>Visited</span><span><i class="found"></i>Found</span><span><i class="inserted"></i>Inserted</span>'; shell.appendChild(legend);
-  el.appendChild(shell); drawTreeSvg(stage,root,null);
+function cleanupTreeDisplayDetails(){
+  document.getElementById('treeDetails')?.remove();
 }
+
+function renderTreeCanvas(){
+  const el=document.getElementById('canvasContent'); if(!el)return;
+  cleanupTreeDisplayDetails();
+  el.innerHTML='';
+  const root=treeDisplayRoot||treeRoot||treeSampleRoot(treeActiveStructure);
+
+  // Keep the actual tree in #canvasContent so mobile zoom/pinch affects only it.
+  const shell=document.createElement('div'); shell.className='tree-viz-shell'; shell.id='treeVizShell';
+  const meta=document.createElement('div');
+  meta.className='tree-viz-meta';
+  meta.innerHTML=`<span class="tree-badge">${treeCurrentStructure()==='bst'?'BINARY SEARCH TREE':'BINARY TREE'}</span><span class="tree-badge neutral">${treeNodeCount(root)} nodes · height ${Math.max(0,treeHeight(root)-1)}</span>`;
+  shell.appendChild(meta);
+  const stage=document.createElement('div'); stage.className='tree-stage'; stage.id='treeStage'; shell.appendChild(stage);
+  el.appendChild(shell);
+
+  // Keep the overview/theory/legend outside the zoomable visualization.
+  // The existing LIVE EXPLANATION sits between the tree and these details.
+  const card=el.closest('.ws-canvas-card');
+  if(card){
+    const details=document.createElement('div');
+    details.className='tree-details';
+    details.id='treeDetails';
+    details.innerHTML=`
+      <div class="tree-order-panel">
+        <div class="tree-order-title">${TREE_TRAVERSAL_ALGOS.includes(State.algo)?traversalLabel(treeTraversalOrder)+' result':'Tree overview'}</div>
+        <div class="tree-order-list" id="treeOrderList"><span style="color:var(--text-2);font-size:11px">Use Play / Next to trace the tree.</span></div>
+        <div class="tree-stack-view" id="treeStackView"></div>
+      </div>
+      <!-- Tree overview theory strip intentionally removed for a more compact display. -->
+      <div class="tree-legend"><span><i class="current"></i>Current</span><span><i class="visited"></i>Visited</span><span><i class="found"></i>Found</span><span><i class="inserted"></i>Inserted</span></div>`;
+
+    const live=card.querySelector('#vizLiveExplain');
+    if(live) card.insertBefore(details,live.nextSibling);
+    else card.appendChild(details);
+  }
+  drawTreeSvg(stage,root,null);
+}
+
 function fitTreeSvgToStage(stage,svg,baseWidth,baseHeight){
   if(!stage||!svg)return;
   const available=Math.max(180,stage.clientWidth-12);
@@ -9100,7 +9626,8 @@ function renderTreeStep(){
   const stage=shell.querySelector('#treeStage');
   if(stage)drawTreeSvg(stage,root,st);
   const meta=shell.querySelector('.tree-viz-meta'); if(meta)meta.querySelector('.tree-badge.neutral')?.replaceWith(Object.assign(document.createElement('span'),{className:'tree-badge neutral',textContent:`${treeNodeCount(root)} nodes · height ${Math.max(0,treeHeight(root)-1)}`}));
-  const list=shell.querySelector('#treeOrderList'); const stack=shell.querySelector('#treeStackView');
+  const details=document.getElementById('treeDetails');
+  const list=details?.querySelector('#treeOrderList'); const stack=details?.querySelector('#treeStackView');
   if(list){
     const result=st?.result||[];
     if(result.length)list.innerHTML=result.map((v,i)=>`<span class="tree-order-chip ${i===result.length-1?'active':'done'}">${escapeHtml(String(v))}</span>`).join('');
@@ -9110,7 +9637,14 @@ function renderTreeStep(){
     const vals=st?.callStack?.length?st.callStack.map(id=>{const n=findTreeNodeById(root,id);return n?.value}).filter(v=>v!==undefined):st?.stack||[];
     stack.innerHTML=vals.length?vals.map((v,i)=>`<span class="tree-stack-item ${i===vals.length-1?'top':''}">${escapeHtml(String(v))}${i===vals.length-1?' ← top':''}</span>`).join(''):(TREE_TRAVERSAL_ALGOS.includes(State.algo)?'<span style="color:var(--text-2);font:10px var(--font-mono)">'+(treeTraversalMode==='recursive'?'Call stack empty':'Stack empty')+'</span>':'');
   }
-  updateSidePanel(); updateStepUI();
+  const detailsTheory=details?.querySelectorAll('.tree-theory-pill span');
+  if(detailsTheory?.length>=3){
+    const h=Math.max(0,treeHeight(root)-1);
+    detailsTheory[0].textContent=`${root?root.value:'∅'} is the starting node.`;
+    detailsTheory[1].textContent=`${h} edge${h===1?'':'s'} on the deepest root-to-leaf path.`;
+    detailsTheory[2].textContent='Every traversal visits each node once → O(n).';
+  }
+  updateLiveVisualization(st); updateSidePanel(); updateStepUI();
 }
 function findTreeNodeById(root,id){ if(!root)return null;if(root.id===id)return root;return findTreeNodeById(root.left,id)||findTreeNodeById(root.right,id); }
 function renderTreeExplainPanel(st){
@@ -9120,7 +9654,7 @@ function renderTreeExplainPanel(st){
   const traversal=TREE_TRAVERSAL_ALGOS.includes(key);
   const theory= key==='bst' ? 'A BST keeps smaller keys in the left subtree and larger keys in the right subtree. That ordering turns a tree path into the search path.' : key==='btree' ? 'A binary tree allows each node to have zero, one, or two children. Unlike a BST, there is no global ordering rule.' : `${treeTraversalMode==='recursive'?'Recursive':'Iterative'} ${traversalLabel(treeTraversalOrder).toLowerCase()} traversal.`;
   body.innerHTML=`<div class="panel-hero"><div><div class="panel-kicker">${traversal?'TREE TRAVERSAL':'TREE DATA STRUCTURE'} · LIVE STEP</div><div class="panel-title">${escapeHtml(name)}</div><div class="panel-subtitle">${escapeHtml(st?.explain||theory)}</div></div><span class="panel-status">${st?.op||'READY'}</span></div>
-    <div class="panel-block"><h4>What is happening?</h4><div class="explain-text">${escapeHtml(st?.explain||theory)}</div><div class="panel-callout"><b>Why this step matters:</b> ${escapeHtml(st?.why|| (traversal?'The traversal controls define the exact order in which nodes become part of the result.':'Use the value input to search, insert, or delete while watching the path on the tree.'))}</div></div>
+    
     <div class="panel-metrics"><div class="panel-metric"><div class="label">Nodes</div><div class="value">${treeNodeCount(treeSnapshotFor(st))}</div></div><div class="panel-metric"><div class="label">Height</div><div class="value">${Math.max(0,treeHeight(treeSnapshotFor(st))-1)}</div></div><div class="panel-metric"><div class="label">Step</div><div class="value">${State.steps.length?Math.max(0,State.stepIdx+1)+' / '+State.steps.length:'0 / 0'}</div></div></div>
     <div class="panel-block"><h4>Remember</h4><div class="kv-row"><span>${key==='bst'?'Search/insert/delete follow comparisons.':traversal?'Order is the rule; implementation is the mechanism.':'Structure alone does not imply sorting.'}</span><b>${traversal?(treeTraversalMode==='recursive'?'CALL STACK':'EXPLICIT STACK'):(key==='bst'?'O(h) PATH':'LEVEL ORDER')}</b></div></div>`;
 }
@@ -9144,6 +9678,7 @@ function renderSoon(key){
 let stackData = [10,25,7];
 
 function renderStructureMode(kind){
+  cleanupTreeDisplayDetails();
   pausePlayback();
   document.querySelector('#view-workspace .workspace')?.classList.remove('fundamental-mode');
   State.algo = kind==='array' ? null : kind;
@@ -9173,6 +9708,7 @@ function renderStack(){
 
 /* ---------------------------- INITIAL EMPTY STATE ---------------------------- */
 function showEmptyState(){
+  cleanupTreeDisplayDetails();
   document.getElementById('canvasContent').innerHTML = `
     <div class="empty-state">
       <svg class="empty-graphic" viewBox="0 0 200 200" fill="none">
@@ -9931,7 +10467,7 @@ document.addEventListener('keydown', (e)=>{
     document.getElementById('advReset').onclick=()=>refreshAdvanced();
   }
 
-  function renderAdvancedCanvas(){const el=document.getElementById('canvasContent');el.innerHTML='';const st=State.stepIdx>=0?State.steps[State.stepIdx]:State.steps[0];const wrap=document.createElement('div');wrap.className='advanced-viz-shell';const info=advancedInfo(advancedKey);wrap.innerHTML=`<div class="advanced-viz-meta"><span class="tree-badge">${esc(info.kicker||'DSA')}</span><span class="tree-badge neutral">${State.steps.length} steps</span></div><div class="advanced-stage" id="advancedStage"></div><div class="advanced-trace" id="advancedTrace"></div>`;el.appendChild(wrap);renderAdvancedStage(st);}
+  function renderAdvancedCanvas(){const el=document.getElementById('canvasContent');el.innerHTML='';const st=State.stepIdx>=0?State.steps[State.stepIdx]:State.steps[0];const wrap=document.createElement('div');wrap.className='advanced-viz-shell';const info=advancedInfo(advancedKey);wrap.innerHTML=`<div class="advanced-viz-meta"><span class="tree-badge">${esc(info.kicker||'DSA')}</span><span class="tree-badge neutral">${State.steps.length} steps</span></div><div class="advanced-stage" id="advancedStage"></div><div class="advanced-trace" id="advancedTrace" hidden></div>`;el.appendChild(wrap);renderAdvancedStage(st);}
   function renderAdvancedStage(st){const stage=document.getElementById('advancedStage');if(!stage)return;stage.innerHTML='';const snap=st?.snapshot||{};const kind=st?.kind||'text';if(kind==='array'){const vals=Array.isArray(snap)?snap:(Array.isArray(snap.values)?snap.values:[]);const row=document.createElement('div');row.className='adv-bars';vals.forEach((v,i)=>{const c=document.createElement('div');c.className='adv-bar-cell';const bar=document.createElement('div');bar.className='adv-bar';bar.style.height=(25+Math.min(75,Math.abs(Number(v))*0.75))+'%';if(st.idx?.includes(i)||snap.found===i)bar.classList.add('active');bar.textContent=v;c.appendChild(bar);const l=document.createElement('small');l.textContent=i;c.appendChild(l);row.appendChild(c);});stage.appendChild(row);return;}if(kind==='hash'){renderHash(stage,snap,st);return;}if(kind==='hash-chain'){renderHashChain(stage,snap,st);return;}if(kind==='heap'){renderAdvancedHeap(stage,snap,st);return;}if(kind==='tree'){drawAdvancedTree(stage,snap);return;}if(kind==='trie'){renderTrie(stage,snap);return;}if(kind==='graph'){renderGraph(stage,snap,st);return;}if(kind==='matrix'){renderMatrix(stage,snap.matrix);return;}if(kind==='dsu'){renderDSU(stage,snap);return;}if(kind==='segment'){renderSegment(stage,snap);return;}if(kind==='fenwick'){renderFenwick(stage,snap);return;}if(kind==='grid'||kind==='sudoku'||kind==='maze'){renderGrid(stage,snap,kind,st);return;}if(kind==='bits'){renderBits(stage,snap);return;}if(kind==='string'){renderString(stage,snap,st);return;}const card=document.createElement('div');card.className='advanced-text-card';card.innerHTML=`<div class="advanced-kicker">${esc(infoLabel(advancedKey))}</div><h3>${esc(snap.title||infoLabel(advancedKey))}</h3><p>${esc(st?.explain||advancedInfo(advancedKey).def)}</p>`;stage.appendChild(card);}
   function infoLabel(k){return advancedInfo(k)?.title||k;}
 
@@ -9948,8 +10484,8 @@ document.addEventListener('keydown', (e)=>{
   function renderGrid(stage,snap,kind,st){const board=snap.board||snap.grid;const wrap=document.createElement('div');wrap.className='grid-viz';(board||[]).forEach((row,r)=>row.forEach((cell,c)=>{const d=document.createElement('div');d.className='grid-cell';if(snap.current?.[0]===r&&snap.current?.[1]===c)d.classList.add('active');if(cell==='#')d.classList.add('wall');d.textContent=cell===0||cell==='.'?'':cell;wrap.appendChild(d);}));stage.appendChild(wrap);}
   function renderBits(stage,snap){const wrap=document.createElement('div');wrap.className='bits-viz';[['A',snap.a],['B',snap.b],['RESULT',snap.value]].forEach(([k,v])=>{if(v===undefined)return;const row=document.createElement('div');row.innerHTML=`<span>${k}</span>${v.toString(2).padStart(8,'0').split('').map(x=>`<b>${x}</b>`).join('')}`;wrap.appendChild(row);});stage.appendChild(wrap);}
   function renderString(stage,snap,st){const wrap=document.createElement('div');wrap.className='string-viz';wrap.innerHTML=`<div><small>TEXT</small><p>${[...(snap.text||'')].map((ch,i)=>`<span class="${i===((snap.i??-1))?'active':''}">${esc(ch)}</span>`).join('')}</p></div><div><small>PATTERN</small><p>${[...(snap.pat||'')].map((ch,i)=>`<span class="${i===((snap.j??-1))?'active':''}">${esc(ch)}</span>`).join('')}</p></div>`;stage.appendChild(wrap);}
-  function renderAdvancedStep(){if(!isAdvanced(State.algo))return;const st=State.stepIdx>=0?State.steps[State.stepIdx]:State.steps[0];renderAdvancedStage(st);const trace=document.getElementById('advancedTrace');if(trace){trace.innerHTML=`<div class="advanced-trace-op">${esc(st?.op||'READY')}</div><div>${esc(st?.explain||advancedInfo(advancedKey).def)}</div><small>${esc(st?.why||'Follow the state change to understand the algorithm.')}</small>`;}updateSidePanel();updateStepUI();}
-  function renderAdvancedExplain(){const st=State.stepIdx>=0?State.steps[State.stepIdx]:State.steps[0];const body=document.getElementById('sidePanelBody');body.innerHTML=`<div class="panel-hero"><div><div class="panel-kicker">${esc(advancedInfo(advancedKey).kicker)}</div><div class="panel-title">${esc(advancedInfo(advancedKey).title)}</div><div class="panel-subtitle">${esc(advancedInfo(advancedKey).def)}</div></div><span class="panel-status">${esc(st?.op||'READY')}</span></div><div class="panel-block"><h4>What is happening?</h4><div class="explain-text">${esc(st?.explain||advancedInfo(advancedKey).def)}</div><div class="panel-callout"><b>Why this step matters:</b> ${esc(st?.why||'Connect the current state to the rule of the data structure or algorithm.')}</div></div><div class="panel-metrics"><div class="panel-metric"><div class="label">Step</div><div class="value">${State.steps.length?Math.max(0,State.stepIdx+1)+' / '+State.steps.length:'0 / 0'}</div></div><div class="panel-metric"><div class="label">Time</div><div class="value">${esc(advancedInfo(advancedKey).time)}</div></div><div class="panel-metric"><div class="label">Space</div><div class="value">${esc(advancedInfo(advancedKey).space)}</div></div></div>`;}
+  function renderAdvancedStep(){if(!isAdvanced(State.algo))return;const st=State.stepIdx>=0?State.steps[State.stepIdx]:State.steps[0];renderAdvancedStage(st);const trace=document.getElementById('advancedTrace');if(trace){trace.innerHTML=`<div class="advanced-trace-op">${esc(st?.op||'READY')}</div><div>${esc(st?.explain||advancedInfo(advancedKey).def)}</div><small>${esc(st?.why||'Follow the state change to understand the algorithm.')}</small>`;}updateLiveVisualization(st); updateSidePanel();updateStepUI();}
+  function renderAdvancedExplain(){const st=State.stepIdx>=0?State.steps[State.stepIdx]:State.steps[0];const body=document.getElementById('sidePanelBody');body.innerHTML=`<div class="panel-hero"><div><div class="panel-kicker">${esc(advancedInfo(advancedKey).kicker)}</div><div class="panel-title">${esc(advancedInfo(advancedKey).title)}</div><div class="panel-subtitle">${esc(advancedInfo(advancedKey).def)}</div></div><span class="panel-status">${esc(st?.op||'READY')}</span></div><div class="panel-metrics"><div class="panel-metric"><div class="label">Step</div><div class="value">${State.steps.length?Math.max(0,State.stepIdx+1)+' / '+State.steps.length:'0 / 0'}</div></div><div class="panel-metric"><div class="label">Time</div><div class="value">${esc(advancedInfo(advancedKey).time)}</div></div><div class="panel-metric"><div class="label">Space</div><div class="value">${esc(advancedInfo(advancedKey).space)}</div></div></div>`;}
   function renderAdvancedInfo(){const i=advancedInfo(advancedKey),body=document.getElementById('sidePanelBody');body.innerHTML=`<div class="panel-hero"><div><div class="panel-kicker">${esc(i.kicker)}</div><div class="panel-title">${esc(i.title)}</div><div class="panel-subtitle">${esc(i.def)}</div></div><span class="panel-status">INFO</span></div><div class="panel-block"><h4>Core concepts</h4>${i.sections.map((x,n)=>`<div class="fund-section"><h4>${n+1}. Concept</h4><p>${esc(x)}</p></div>`).join('')}</div><div class="panel-block"><h4>Complexity</h4><div class="kv-row"><span>Time complexity</span><b>${esc(i.time)}</b></div><div class="kv-row"><span>Space complexity</span><b>${esc(i.space)}</b></div></div><div class="panel-block"><h4>Applications</h4><div class="panel-callout">${esc(i.use)}</div></div><div class="panel-block"><h4>Study tip</h4><div class="explain-text">Trace one example manually, then use Play/Next to compare your prediction with the visual state.</div></div>`;}
   // Detailed Java implementations shown in the Code tab for every advanced roadmap visual.
   // Related topics intentionally share the same complete implementation while the heading/focus
@@ -12379,5 +12915,289 @@ class ActivitySelection {
 })();
 
 </script>
+
+<script id="adaptive-viz-behavior">
+/* ================================================================
+   ADAPTIVE DISPLAY + NATURAL LIVE NARRATION
+================================================================ */
+(function initAdaptiveVisualizationDisplay(){
+  const area=document.getElementById('canvasArea');
+  const canvas=document.getElementById('canvasContent');
+  if(!area || !canvas) return;
+
+  function vizType(){
+    if(canvas.querySelector('.list-viz')) return 'list';
+    if(canvas.querySelector('.stack-mode-wrap,.stack-viz')) return 'stack';
+    if(canvas.querySelector('.queue-mode-wrap,.queue-viz')) return 'queue';
+    if(canvas.querySelector('.tree-viz-shell,.tree-stage')) return 'tree';
+    if(canvas.querySelector('.rec-wrap,.rec-stage')) return 'recursion';
+    if(canvas.querySelector('.advanced-viz-shell,.advanced-stage')) return 'advanced';
+    if(canvas.querySelector('.bars-viz,#barsViz,.adv-bars')) return 'bars';
+    if(canvas.querySelector('.empty-state,.soon-block')) return 'empty';
+    return 'generic';
+  }
+
+  let raf=0;
+  function sync(){
+    cancelAnimationFrame(raf);
+    raf=requestAnimationFrame(()=>{
+      const type=vizType();
+      area.dataset.vizType=type;
+      canvas.dataset.vizType=type;
+      /* Keep the display flow tight to the actual rendered content. */
+      const live=document.getElementById('vizLiveExplain');
+      if(live){
+        const compact=['list','stack','queue','tree','recursion','advanced','bars'].includes(type);
+        live.dataset.displayMode=compact?'adaptive':'standard';
+      }
+    });
+  }
+
+  const mo=new MutationObserver(sync);
+  mo.observe(canvas,{childList:true,subtree:true});
+  window.addEventListener('resize',sync,{passive:true});
+  window.addEventListener('orientationchange',()=>setTimeout(sync,80),{passive:true});
+  sync();
+  window.__adaptiveVizSync=sync;
+})();
+
+/* Clear, detailed narration for the live explanation and English voice. */
+(function upgradeVoiceAssistant(){
+  const supported='speechSynthesis' in window && 'SpeechSynthesisUtterance' in window;
+  if(!supported) return;
+
+  let preferredVoice=null;
+  const chooseVoice=()=>{
+    const voices=window.speechSynthesis.getVoices()||[];
+    const english=voices.filter(v=>/^en(?:-|_)/i.test(v.lang));
+    if(!english.length){preferredVoice=null;return;}
+    const score=v=>{
+      const n=(v.name||'').toLowerCase();
+      let score=0;
+      if(/natural|neural|enhanced/.test(n)) score+=80;
+      if(/google/.test(n)) score+=40;
+      if(/microsoft/.test(n)) score+=35;
+      if(/samantha|karen|daniel|ava|aria|jenny|guy/.test(n)) score+=20;
+      if(/en-us/.test((v.lang||'').toLowerCase())) score+=12;
+      return score;
+    };
+    preferredVoice=english.slice().sort((a,b)=>score(b)-score(a))[0]||english[0];
+  };
+  chooseVoice();
+  window.speechSynthesis.addEventListener?.('voiceschanged',chooseVoice);
+
+  const suffix={
+    COMPARE:'This check told the algorithm what to do next.',
+    SWAP:'The values changed positions, so the current order moved closer to the required result.',
+    PIVOT:'The remaining values were compared with this pivot to decide which side they belonged on.',
+    SORTED:'This part was now fixed and did not need to be changed again.',
+    FOUND:'The search could stop because the required value had been located.',
+    'NOT FOUND':'The search could stop because no matching value remained in the possible range.',
+    VISIT:'This node was then processed in the current traversal step.',
+    'NO MATCH':'Because the values did not match, the algorithm continued with the next possible position.',
+    'GO RIGHT':'The left side could be discarded, so the search continued on the right.',
+    'GO LEFT':'The right side could be discarded, so the search continued on the left.',
+    'SET MID':'The middle value gave the algorithm the next comparison point.',
+    'NEW RANGE':'The search then continued inside this smaller range.',
+    SPLIT:'Each smaller range was then solved independently.',
+    MERGE:'The two sorted parts were combined while keeping the result in order.',
+    PLACE:'This value was written into the next correct position of the result.',
+    SHIFT:'This created space for the value that still needed to be inserted.',
+    INSERT:'The sorted region then grew by one correctly placed value.',
+    SELECT:'This value became the current candidate while the remaining values were checked.',
+    'UPDATE MIN':'This new value became the minimum candidate for the rest of the scan.',
+    'SELECT KEY':'The next step then placed this value into the correct position in the sorted region.',
+    ENQUEUE:'The new item became part of the queue and waited at the rear.',
+    'ENQUEUE (WRAP)':'The rear wrapped around to the first free position, which was how the queue used its circular storage.',
+    DEQUEUE:'Removing the front item made the next item the new front of the queue.',
+    PEEK:'The structure was inspected without removing the item.',
+    PUSH:'The item was placed on top and became the first item considered by a later pop operation.',
+    POP:'The top item was removed, so the next item underneath became the new top.',
+    'ADD FIRST':'The new node became the first node in the structure.',
+    'ADD LAST':'The new node was attached at the end of the structure.',
+    'REMOVE FIRST':'The first node was removed, and the next node became the new beginning.',
+    'REMOVE LAST':'The last node was removed, so the previous node became the new end.',
+    INIT:'This established the starting state before the main operation began.',
+    READY:'The structure was ready, so the next step showed the first operation.',
+    EMPTY:'There was nothing available to process at that moment.',
+    DONE:'The operation was complete and no more steps were needed.',
+    CALL:'The recursive call stack recorded this node so the function knew where to return later.',
+    'BASE CASE':'The stopping condition had been reached, so recursion did not continue from there.',
+    RECURSE:'The problem was reduced to a smaller case, and the function continued from there.',
+    RETURN:'This result was passed back to the previous function call.',
+    COMPUTE:'The current values were combined to produce the result for this step.',
+    'BASE MOVE':'This was the required base move, which got the recursive process started.',
+    MOVE:'The selected item moved to the required position while the other items remained available.',
+    TOTAL:'The running total was updated with this value.',
+    SETTLED:'This value was now final, so the algorithm did not need to improve it later.',
+    'EXTRACT MIN':'The smallest remaining value was selected as the next item to process.',
+    'SIFT UP':'The new value moved upward until the heap property was restored.',
+    'SIFT DOWN':'The value moved downward until the heap property was restored.',
+    ERROR:'The requested operation could not continue from the current state.'
+  };
+
+  const friendlyPrefix={
+    COMPARE:'Now, we are comparing',
+    SWAP:'Now, we are swapping',
+    VISIT:'Now, we visit',
+    PUSH:'Now, we push',
+    POP:'Now, we pop',
+    ENQUEUE:'Now, we enqueue',
+    DEQUEUE:'Now, we dequeue',
+    PEEK:'Now, we peek at',
+    INSERT:'Now, we insert',
+    SHIFT:'Now, we shift',
+    PLACE:'Now, we place',
+    SPLIT:'Now, we split',
+    MERGE:'Now, we merge',
+    PIVOT:'Now, we choose',
+    'SET MID':'Now, we check',
+    'GO LEFT':'Now, we move left because',
+    'GO RIGHT':'Now, we move right because'
+  };
+
+  function cleanText(value){
+    return String(value||'')
+      .replace(/\s+/g,' ')
+      .replace(/\s*→\s*/g,' to ')
+      .replace(/\s*->\s*/g,' to ')
+      .trim();
+  }
+
+  /* Convert the generated live explanation into a clear past-tense narration.
+     The step generators can use present-tense descriptions; the narrator and
+     on-screen live explanation consistently describe what has just happened. */
+  function toPastTense(value){
+    let text=cleanText(value);
+    if(!text) return '';
+    const replacements=[
+      [/\bisn't\b/gi,'was not'],[/\baren't\b/gi,'were not'],[/\bdoesn't\b/gi,'did not'],[/\bdon't\b/gi,'did not'],
+      [/\bcan't\b/gi,'could not'],[/\bcannot\b/gi,'could not'],[/\bwon't\b/gi,'would not'],
+      [/\bwill\b/gi,'would'],[/\bcan\b/gi,'could'],[/\bmust\b/gi,'had to'],
+      [/\bis being\b/gi,'was'],[/\bare being\b/gi,'were'],[/\bis\b/gi,'was'],[/\bare\b/gi,'were'],[/\bam\b/gi,'was'],
+      [/\bhas been\b/gi,'had been'],[/\bhave been\b/gi,'had been'],[/\bhas\b/gi,'had'],[/\bhave\b/gi,'had'],
+      [/\bwas being\b/gi,'was'],[/\bwere being\b/gi,'were'],
+      [/\bchanges\b/gi,'changed'],[/\bchanges?\b/gi,'changed'],[/\bmoves\b/gi,'moved'],[/\bmove\b/gi,'moved'],
+      [/\bcontinues\b/gi,'continued'],[/\bcontinue\b/gi,'continued'],[/\bremains\b/gi,'remained'],[/\bremain\b/gi,'remained'],
+      [/\bcompares\b/gi,'compared'],[/\bcompare\b/gi,'compared'],[/\bcompared\b/gi,'compared'],
+      [/\bchecks\b/gi,'checked'],[/\bcheck\b/gi,'checked'],[/\bselects\b/gi,'selected'],[/\bselect\b/gi,'selected'],
+      [/\bplaces\b/gi,'placed'],[/\bplace\b/gi,'placed'],[/\bremoves\b/gi,'removed'],[/\bremove\b/gi,'removed'],
+      [/\badds\b/gi,'added'],[/\badd\b/gi,'added'],[/\binserts\b/gi,'inserted'],[/\binsert\b/gi,'inserted'],
+      [/\bvisits\b/gi,'visited'],[/\bvisit\b/gi,'visited'],[/\bpasses\b/gi,'passed'],[/\bpass\b/gi,'passed'],
+      [/\buses\b/gi,'used'],[/\buse\b/gi,'used'],[/\bneeds\b/gi,'needed'],[/\bneed\b/gi,'needed'],
+      [/\bgets\b/gi,'got'],[/\bget\b/gi,'got'],[/\bbecomes\b/gi,'became'],[/\bbecome\b/gi,'became'],
+      [/\bgrows\b/gi,'grew'],[/\bgrow\b/gi,'grew'],[/\bwaits\b/gi,'waited'],[/\bwait\b/gi,'waited'],
+      [/\bwraps\b/gi,'wrapped'],[/\bwrap\b/gi,'wrapped'],[/\bcreates\b/gi,'created'],[/\bcreate\b/gi,'created'],
+      [/\bis ready\b/gi,'was ready'],[/\bis complete\b/gi,'was complete'],[/\bis fixed\b/gi,'was fixed'],
+      [/\bis located\b/gi,'was located'],[/\bis reached\b/gi,'was reached'],[/\bis written\b/gi,'was written'],
+      [/\bare combined\b/gi,'were combined'],[/\bare compared\b/gi,'were compared'],[/\bare checked\b/gi,'were checked'],
+      [/\bthere is\b/gi,'there was'],[/\bthere are\b/gi,'there were']
+    ];
+    for(const [re,repl] of replacements) text=text.replace(re,repl);
+    return text;
+  }
+
+  function buildDetailedText(step){
+    if(!step) return '';
+    const op=String(step.op||'').trim().toUpperCase();
+    const raw=toPastTense(step.explain);
+    let text=raw;
+
+    /* Keep the exact concrete detail already produced by each step generator,
+       then add one small sentence that explains the purpose of the action. */
+    if(text){
+      const ending=suffix[op]||'This step moves the algorithm one stage closer to the final result.';
+      if(!/[.!?]$/.test(text)) text+='.';
+      text+=' '+ending;
+    }else{
+      const fallback={
+        COMPARE:'The current values were compared to decide the next action.',
+        SWAP:'The two selected values exchanged positions.',
+        VISIT:'The current node was processed.',
+        PUSH:'An item was added to the top of the stack.',
+        POP:'The top item was removed from the stack.',
+        ENQUEUE:'An item was added to the rear of the queue.',
+        DEQUEUE:'The front item was removed from the queue.',
+        PEEK:'The front or top item was inspected without removing it.',
+        INSERT:'A value was placed into its correct position.',
+        READY:'The visualization was ready for the first step.',
+        DONE:'The operation was complete.'
+      };
+      text=fallback[op]||'The visualization is continuing with the next step.';
+    }
+
+    /* Keep the narration detailed but still easy to follow on mobile. */
+    if(text.length>285){
+      const cut=text.slice(0,285);
+      const lastSpace=cut.lastIndexOf(' ');
+      text=cut.slice(0,lastSpace>170?lastSpace:285).trim();
+      if(!/[.!?]$/.test(text)) text+='.';
+    }
+    return text;
+  }
+
+  let lastNarrated='';
+  let lastShown='';
+  function explanationText(step){
+    const text=buildDetailedText(step);
+    if(!text) return lastShown || 'Press Next or Play to follow the visualization step by step.';
+    if(text===lastShown) return lastShown;
+    lastShown=text;
+    return text;
+  }
+
+  window.__simpleVizExplanation=buildDetailedText;
+  window.__naturalVizVoiceText=buildDetailedText;
+  window.__preferredVizVoice=()=>preferredVoice;
+  window.__voiceNarrationMap=suffix;
+
+  window.__speakVisualizationStepNatural=function(step,onDone){
+    const done=typeof onDone==='function'?onDone:()=>{};
+    if(!step || voiceMuted){done();return;}
+    if(!supported){done();return;}
+    const text=buildDetailedText(step);
+    const key=text.toLowerCase();
+    if(key===lastNarrated){done();return;}
+    lastNarrated=key;
+    const utterance=new SpeechSynthesisUtterance(text);
+    utterance.lang=preferredVoice?.lang||'en-US';
+    utterance.voice=preferredVoice||null;
+    utterance.rate=.82;
+    utterance.pitch=1.0;
+    utterance.volume=.96;
+    let ended=false;
+    const finish=()=>{if(ended)return;ended=true;done();};
+    utterance.onend=finish;
+    utterance.onerror=finish;
+    window.speechSynthesis.cancel();
+    window.speechSynthesis.speak(utterance);
+  };
+
+  speakVisualizationStep=function(step,onDone){
+    const done=typeof onDone==='function'?onDone:()=>{};
+    if(!step || voiceMuted){done();return;}
+    window.__speakVisualizationStepNatural(step,done);
+  };
+
+  const originalUpdate=updateLiveVisualization;
+  updateLiveVisualization=function(step,speakNow=false){
+    const textEl=document.getElementById('vizLiveText');
+    const whyEl=document.getElementById('vizLiveWhy');
+    if(!textEl) return originalUpdate(step,speakNow);
+    const next=explanationText(step);
+    if(next && textEl.textContent.trim()!==next) textEl.textContent=next;
+    if(whyEl) whyEl.textContent='';
+    if(speakNow) speakVisualizationStep(step);
+  };
+
+  window.addEventListener('beforeunload',()=>{
+    try{window.speechSynthesis?.cancel();}catch(e){}
+  });
+  syncVoiceAssistantUI();
+})();
+</script>
+
 </body>
 </html>
+
+<style id="tree-theory-strip-compact-guard">.tree-theory-strip{display:none !important;}</style>
