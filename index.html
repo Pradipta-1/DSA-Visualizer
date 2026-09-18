@@ -3168,12 +3168,12 @@ body{background-color:var(--bg-0)}
   height:100%;
   display:block;
   pointer-events:none;
-  opacity:.62;
+  opacity:.68;
 }
-[data-theme="light"] #networkCanvas{opacity:.23}
+[data-theme="light"] #networkCanvas{opacity:.27}
 @media(max-width:700px){
-  #networkCanvas{opacity:.46}
-  [data-theme="light"] #networkCanvas{opacity:.16}
+  #networkCanvas{opacity:.50}
+  [data-theme="light"] #networkCanvas{opacity:.18}
 }
 </style>
 
@@ -13398,7 +13398,7 @@ class ActivitySelection {
         const dist=Math.hypot(dx,dy);
 
         if(dist<LINK_DIST){
-          const alpha=(1-dist/LINK_DIST)*0.16;
+          const alpha=(1-dist/LINK_DIST)*0.20;
           ctx.strokeStyle=`rgba(${a.c[0]},${a.c[1]},${a.c[2]},${alpha})`;
           ctx.lineWidth=1;
           ctx.beginPath();
@@ -13411,7 +13411,7 @@ class ActivitySelection {
 
     for(const p of particles){
       ctx.beginPath();
-      ctx.fillStyle=`rgba(${p.c[0]},${p.c[1]},${p.c[2]},0.55)`;
+      ctx.fillStyle=`rgba(${p.c[0]},${p.c[1]},${p.c[2]},0.64)`;
       ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
       ctx.fill();
     }
