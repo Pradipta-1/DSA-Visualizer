@@ -2685,6 +2685,14 @@ body::after{
   to{background-position:42px 42px,-42px 42px}
 }
 
+/* Pointer-following glow is fed through --pointer-x / --pointer-y by JS. */
+body.ui-pointer-glow::before{
+  background:
+    radial-gradient(340px circle at var(--pointer-x,50%) var(--pointer-y,50%), rgba(255,255,255,.045), transparent 62%),
+    radial-gradient(circle at 16% 22%, rgba(255,99,63,.12), transparent 21%),
+    radial-gradient(circle at 78% 20%, rgba(217,70,239,.10), transparent 22%),
+    radial-gradient(circle at 58% 82%, rgba(94,230,197,.07), transparent 20%);
+}
 
 /* Elevated, tactile surfaces. */
 .btn,.search-btn,.icon-btn,.gh-btn,.wbtn,.ctrl-btn,.speed-pill,.path-card,.card,.how-card,.panel-block,.fund-card,.quiz-card,.kv-row{
@@ -3071,6 +3079,9 @@ body::after{
   --glow-c:rgba(217,70,239,.10);
 }
 
+.scroll-progress{position:fixed;left:0;right:0;top:0;height:3px;z-index:3000;pointer-events:none;background:transparent}
+.scroll-progress span{display:block;height:100%;width:0;transform-origin:left center;background:linear-gradient(90deg,var(--accent),var(--accent-3),var(--accent-2));box-shadow:0 0 18px var(--glow-a),0 0 26px var(--glow-b);transition:width .08s linear}
+
 .navbar{backdrop-filter:blur(18px) saturate(155%);transition:box-shadow .25s ease,background .25s ease,transform .25s ease}
 .navbar.scrolled{box-shadow:0 12px 38px rgba(5,10,28,.24)}
 
@@ -3122,6 +3133,7 @@ body::after{
 /* Mobile remains lightweight. */
 @media(max-width:700px){
   .card,.path-card,.how-card,.fund-card,.panel-block{backdrop-filter:blur(5px)}
+  .scroll-progress{height:2px}
 }
 
 @media(prefers-reduced-motion:reduce){
@@ -3389,26 +3401,51 @@ body{
 
 /* Close the roadmap when the user taps the actual visualization workspace only.
    Theory/fundamental pages deliberately keep the roadmap open. */
-
-/* ================= PERFORMANCE GUARDRAILS =================
-   Keeps the existing visuals/UX intact while isolating expensive layers. */
-#networkCanvas{
-  will-change:contents;
-  contain:strict;
-}
-body::before,body::after{
-  will-change:transform;
-  contain:paint;
-}
-.app-shell,.navbar,.sidebar,.main{
-  contain:layout style;
-}
-@media (prefers-reduced-motion: reduce){
-  #networkCanvas{display:none !important;}
-}
 </style>
 
-</head><body><canvas id="networkCanvas" aria-hidden="true"></canvas><div class="app-shell"><nav class="navbar"><div class="nav-left"><button class="icon-btn hamburger" id="hamburgerBtn" aria-label="Toggle DSA roadmap sidebar" title="Toggle DSA roadmap sidebar">☰</button><button class="brand" id="brandHomeBtn" type="button" aria-label="Go to home page"><span class="brand-mark">◆</span> DSA Visualizer</button></div><div class="nav-right"><button class="search-btn" id="searchBtn" type="button" aria-expanded="false" aria-controls="searchPanel" title="Search DSA structures">⌕ <span>Search</span></button><button class="menu-btn" id="menuBtn" type="button" aria-expanded="false" aria-controls="menuDrawer">☰ <span>Menu</span></button></div></nav><div class="search-panel" id="searchPanel" aria-hidden="true"><div class="search-panel-head"><div><div class="search-title">Find DSA</div><div class="search-subtitle">Search structures, algorithms, and topics</div></div><button class="icon-btn search-close" id="searchCloseBtn" type="button" aria-label="Close search">×</button></div><div class="search-input-wrap"><span>⌕</span><input id="dsaSearchInput" type="search" autocomplete="off" placeholder="e.g. Binary Tree, Stack, BFS..." aria-label="Search DSA topics"><button id="searchClearBtn" class="search-clear" type="button" aria-label="Clear search">×</button></div><div class="search-results" id="searchResults" role="listbox" aria-label="DSA search results"></div></div><div class="menu-overlay" id="menuOverlay" aria-hidden="true"></div><aside class="menu-drawer" id="menuDrawer" aria-hidden="true"><div class="menu-drawer-head"><h3>Menu</h3><button class="icon-btn menu-close" id="menuCloseBtn" type="button" aria-label="Close menu">×</button></div><nav class="menu-nav" id="navLinks" aria-label="Main navigation"><button data-nav="home" class="active"><span>⌂</span> Home</button><button data-nav="challenges" ><span>◆</span> Challenges</button><button data-nav="algorithms"><span>↕</span> Algorithms</button><button data-nav="datastructures"><span>▦</span> Data Structures</button><button data-nav="learning"><span>◉</span> Learning</button><button data-nav="about"><span>ⓘ</span> About</button></nav><div class="menu-drawer-actions"><a class="gh-btn" href="https://github.com/" target="_blank" rel="noopener noreferrer">★ GitHub</a><button class="menu-theme-btn" id="themeToggle" type="button" aria-label="Toggle theme" title="Toggle light/dark theme"><span class="theme-icon">☾</span><span>Theme</span></button></div><div class="menu-motion-note"><span class="motion-orb"></span><div><b>Interactive motion</b><small>Hover, tilt, click and scroll — the UI reacts.</small></div></div></aside><div class="body-grid"><div class="sidebar-scrim" id="sidebarScrim" aria-hidden="true"></div><aside class="sidebar collapsed" id="sidebar"><div class="sidebar-heading"><span class="roadmap-title">DSA ROADMAP</span><span class="roadmap-sub">LEARN • VISUALIZE • MASTER</span><div class="side-group sidebar-section"><button class="disclosure sidebar-disclosure" type="button" aria-expanded="false"><span class="side-icon">◌</span><span class="side-label">1. DSA Fundamentals</span><span class="chev">▸</span></button><div class="side-sub"><button class="side-item" data-topic="What is Data Structure?"><span class="side-icon">•</span><span class="side-label">What is Data Structure?</span></button><button class="side-item" data-topic="What is Algorithm?"><span class="side-icon">•</span><span class="side-label">What is Algorithm?</span></button><button class="side-item" data-topic="Time Complexity"><span class="side-icon">•</span><span class="side-label">Time Complexity</span></button><button class="side-item" data-topic="Space Complexity"><span class="side-icon">•</span><span class="side-label">Space Complexity</span></button><button class="side-item" data-topic="Big-O"><span class="side-icon">•</span><span class="side-label">Big-O</span></button><button class="side-item" data-topic="Big-Theta"><span class="side-icon">•</span><span class="side-label">Big-Theta</span></button><button class="side-item" data-topic="Big-Omega"><span class="side-icon">•</span><span class="side-label">Big-Omega</span></button><button class="side-item" data-topic="Recursion"><span class="side-icon">•</span><span class="side-label">Recursion</span></button><button class="side-item" data-topic="Iteration"><span class="side-icon">•</span><span class="side-label">Iteration</span></button></div></div><div class="side-group sidebar-section"><button class="disclosure sidebar-disclosure" type="button" aria-expanded="false"><span class="side-icon">▦</span><span class="side-label">2. Arrays</span><span class="chev">▸</span></button><div class="side-sub"><button class="side-item" data-topic="1D Array"><span class="side-icon">•</span><span class="side-label">1D Array</span></button><button class="side-item" data-topic="2D Array"><span class="side-icon">•</span><span class="side-label">2D Array</span></button><button class="side-item" data-topic="Array Traversal"><span class="side-icon">•</span><span class="side-label">Traversal</span></button><button class="side-item" data-topic="Array Insertion"><span class="side-icon">•</span><span class="side-label">Insertion</span></button><button class="side-item" data-topic="Array Deletion"><span class="side-icon">•</span><span class="side-label">Deletion</span></button><button class="side-item" data-topic="Prefix Sum"><span class="side-icon">•</span><span class="side-label">Prefix Sum</span></button><button class="side-item" data-topic="Two Pointer Technique"><span class="side-icon">•</span><span class="side-label">Two Pointer Technique</span></button><button class="side-item" data-topic="Three Sum"><span class="side-icon">•</span><span class="side-label">Three Sum</span></button><button class="side-item" data-topic="Sliding Window"><span class="side-icon">•</span><span class="side-label">Sliding Window</span></button></div></div><div class="side-group sidebar-section"><button class="disclosure sidebar-disclosure" type="button" aria-expanded="false"><span class="side-icon">⇄</span><span class="side-label">3. Linked Lists</span><span class="chev">▸</span></button><div class="side-sub"><button class="side-item" data-open="sll"><span class="side-icon">•</span><span class="side-label">Singly Linked List</span></button><button class="side-item" data-open="dll"><span class="side-icon">•</span><span class="side-label">Doubly Linked List</span></button><button class="side-item" data-open="cll"><span class="side-icon">•</span><span class="side-label">Circular Linked List</span></button><button class="side-item" data-topic="Linked List Traversal"><span class="side-icon">•</span><span class="side-label">Traversal</span></button><button class="side-item" data-topic="Linked List Insertion"><span class="side-icon">•</span><span class="side-label">Insertion</span></button><button class="side-item" data-topic="Linked List Deletion"><span class="side-icon">•</span><span class="side-label">Deletion</span></button><button class="side-item" data-topic="Linked List Searching"><span class="side-icon">•</span><span class="side-label">Searching</span></button><button class="side-item" data-topic="List Reversal"><span class="side-icon">•</span><span class="side-label">Reversal</span></button><button class="side-item" data-topic="Fast &amp; Slow Pointer"><span class="side-icon">•</span><span class="side-label">Fast &amp; Slow Pointer</span></button></div></div><div class="side-group sidebar-section"><button class="disclosure sidebar-disclosure" type="button" aria-expanded="false"><span class="side-icon">▤</span><span class="side-label">4. Stack</span><span class="chev">▸</span></button><div class="side-sub"><button class="side-item" data-open="stack"><span class="side-icon">•</span><span class="side-label">Stack using Array</span></button><button class="side-item" data-open="stack-linked"><span class="side-icon">•</span><span class="side-label">Stack using Linked List</span></button><button class="side-item" data-topic="Push"><span class="side-icon">•</span><span class="side-label">Push</span></button><button class="side-item" data-topic="Pop"><span class="side-icon">•</span><span class="side-label">Pop</span></button><button class="side-item" data-topic="Peek"><span class="side-icon">•</span><span class="side-label">Peek</span></button><button class="side-item" data-topic="Stack Applications"><span class="side-icon">•</span><span class="side-label">Applications</span></button><button class="side-item" data-topic="Parentheses Matching"><span class="side-icon">•</span><span class="side-label">Parentheses Matching</span></button><button class="side-item" data-topic="Infix"><span class="side-icon">•</span><span class="side-label">Infix</span></button><button class="side-item" data-topic="Prefix"><span class="side-icon">•</span><span class="side-label">Prefix</span></button><button class="side-item" data-topic="Postfix"><span class="side-icon">•</span><span class="side-label">Postfix</span></button></div></div><div class="side-group sidebar-section"><button class="disclosure sidebar-disclosure" type="button" aria-expanded="false"><span class="side-icon">▥</span><span class="side-label">5. Queue</span><span class="chev">▸</span></button><div class="side-sub"><button class="side-item" data-open="queue"><span class="side-icon">•</span><span class="side-label">Simple Queue</span></button><button class="side-item" data-open="queue-circular"><span class="side-icon">•</span><span class="side-label">Circular Queue</span></button><button class="side-item" data-open="queue-linked"><span class="side-icon">•</span><span class="side-label">Queue using Linked List</span></button><button class="side-item" data-open="deque"><span class="side-icon">•</span><span class="side-label">Deque</span></button><button class="side-item" data-open="priority-queue"><span class="side-icon">•</span><span class="side-label">Priority Queue</span></button><button class="side-item" data-topic="Enqueue"><span class="side-icon">•</span><span class="side-label">Enqueue</span></button><button class="side-item" data-topic="Dequeue"><span class="side-icon">•</span><span class="side-label">Dequeue</span></button></div></div><div class="side-group sidebar-section"><button class="disclosure sidebar-disclosure" type="button" aria-expanded="false"><span class="side-icon">#</span><span class="side-label">6. Hashing</span><span class="chev">▸</span></button><div class="side-sub"><button class="side-item" data-open="hash"><span class="side-icon">•</span><span class="side-label">Hash Table</span></button><button class="side-item" data-topic="Hash Function"><span class="side-icon">•</span><span class="side-label">Hash Function</span></button><button class="side-item" data-topic="Collision"><span class="side-icon">•</span><span class="side-label">Collision</span></button><button class="side-item" data-topic="Chaining"><span class="side-icon">•</span><span class="side-label">Chaining</span></button><button class="side-item" data-topic="Open Addressing"><span class="side-icon">•</span><span class="side-label">Open Addressing</span></button><button class="side-item" data-topic="Linear Probing"><span class="side-icon">•</span><span class="side-label">Linear Probing</span></button><button class="side-item" data-topic="Hash Searching"><span class="side-icon">•</span><span class="side-label">Searching</span></button><button class="side-item" data-topic="Hash Insertion"><span class="side-icon">•</span><span class="side-label">Insertion</span></button><button class="side-item" data-topic="Hash Deletion"><span class="side-icon">•</span><span class="side-label">Deletion</span></button></div></div><div class="side-group sidebar-section"><button class="disclosure sidebar-disclosure" type="button" aria-expanded="false"><span class="side-icon">▲</span><span class="side-label">7. Trees</span><span class="chev">▸</span></button><div class="side-sub"><button class="side-item" data-topic="Tree Terminology"><span class="side-icon">•</span><span class="side-label">Tree Terminology</span></button><button class="side-item" data-open="btree"><span class="side-icon">•</span><span class="side-label">Binary Tree</span></button><button class="side-item" data-topic="Full Binary Tree"><span class="side-icon">•</span><span class="side-label">Full Binary Tree</span></button><button class="side-item" data-topic="Complete Binary Tree"><span class="side-icon">•</span><span class="side-label">Complete Binary Tree</span></button><button class="side-item" data-topic="Perfect Binary Tree"><span class="side-icon">•</span><span class="side-label">Perfect Binary Tree</span></button><button class="side-item" data-topic="Balanced Tree"><span class="side-icon">•</span><span class="side-label">Balanced Tree</span></button><button class="side-item" data-open="bst"><span class="side-icon">•</span><span class="side-label">Binary Search Tree</span></button><button class="side-item" data-topic="BST Searching"><span class="side-icon">•</span><span class="side-label">BST Searching</span></button><button class="side-item" data-topic="BST Insertion"><span class="side-icon">•</span><span class="side-label">BST Insertion</span></button><button class="side-item" data-topic="BST Deletion"><span class="side-icon">•</span><span class="side-label">BST Deletion</span></button></div></div><div class="side-group sidebar-section"><button class="disclosure sidebar-disclosure" type="button" aria-expanded="false"><span class="side-icon">↕</span><span class="side-label">8. Tree Traversals</span><span class="chev">▸</span></button><div class="side-sub"><button class="side-item" data-open="inorder"><span class="side-icon">•</span><span class="side-label">Inorder</span></button><button class="side-item" data-open="preorder"><span class="side-icon">•</span><span class="side-label">Preorder</span></button><button class="side-item" data-open="postorder"><span class="side-icon">•</span><span class="side-label">Postorder</span></button><button class="side-item" data-open="levelorder"><span class="side-icon">•</span><span class="side-label">Level Order</span></button><button class="side-item" data-open="tree-recursive"><span class="side-icon">•</span><span class="side-label">Recursive Traversal</span></button><button class="side-item" data-open="tree-iterative"><span class="side-icon">•</span><span class="side-label">Iterative Traversal</span></button></div></div><div class="side-group sidebar-section"><button class="disclosure sidebar-disclosure" type="button" aria-expanded="false"><span class="side-icon">◆</span><span class="side-label">9. Heap</span><span class="chev">▸</span></button><div class="side-sub"><button class="side-item" data-open="heap"><span class="side-icon">•</span><span class="side-label">Heap Concept</span></button><button class="side-item" data-topic="Min Heap"><span class="side-icon">•</span><span class="side-label">Min Heap</span></button><button class="side-item" data-topic="Max Heap"><span class="side-icon">•</span><span class="side-label">Max Heap</span></button><button class="side-item" data-topic="Heapify"><span class="side-icon">•</span><span class="side-label">Heapify</span></button><button class="side-item" data-topic="Heap Insert"><span class="side-icon">•</span><span class="side-label">Insert</span></button><button class="side-item" data-topic="Heap Delete"><span class="side-icon">•</span><span class="side-label">Delete</span></button><button class="side-item" data-topic="Extract Min"><span class="side-icon">•</span><span class="side-label">Extract Min</span></button><button class="side-item" data-topic="Extract Max"><span class="side-icon">•</span><span class="side-label">Extract Max</span></button><button class="side-item" data-topic="Heap Priority Queue"><span class="side-icon">•</span><span class="side-label">Priority Queue</span></button></div></div><div class="side-group sidebar-section"><button class="disclosure sidebar-disclosure" type="button" aria-expanded="false"><span class="side-icon">◎</span><span class="side-label">10. Graphs</span><span class="chev">▸</span></button><div class="side-sub"><button class="side-item" data-open="graph"><span class="side-icon">•</span><span class="side-label">Graph Terminology</span></button><button class="side-item" data-topic="Directed Graph"><span class="side-icon">•</span><span class="side-label">Directed Graph</span></button><button class="side-item" data-topic="Undirected Graph"><span class="side-icon">•</span><span class="side-label">Undirected Graph</span></button><button class="side-item" data-topic="Weighted Graph"><span class="side-icon">•</span><span class="side-label">Weighted Graph</span></button><button class="side-item" data-topic="Adjacency Matrix"><span class="side-icon">•</span><span class="side-label">Adjacency Matrix</span></button><button class="side-item" data-topic="Adjacency List"><span class="side-icon">•</span><span class="side-label">Adjacency List</span></button><button class="side-item" data-open="bfs"><span class="side-icon">•</span><span class="side-label">BFS</span></button><button class="side-item" data-open="dfs"><span class="side-icon">•</span><span class="side-label">DFS</span></button><button class="side-item" data-topic="Connected Components"><span class="side-icon">•</span><span class="side-label">Connected Components</span></button><button class="side-item" data-topic="Cycle Detection"><span class="side-icon">•</span><span class="side-label">Cycle Detection</span></button></div></div><div class="side-group sidebar-section"><button class="disclosure sidebar-disclosure" type="button" aria-expanded="false"><span class="side-icon">⌕</span><span class="side-label">11. Searching</span><span class="chev">▸</span></button><div class="side-sub"><button class="side-item" data-open="linear-search"><span class="side-icon">•</span><span class="side-label">Linear Search</span></button><button class="side-item" data-open="binary-search"><span class="side-icon">•</span><span class="side-label">Binary Search</span></button><button class="side-item" data-open="jump-search"><span class="side-icon">•</span><span class="side-label">Jump Search</span></button></div></div><div class="side-group sidebar-section"><button class="disclosure sidebar-disclosure" type="button" aria-expanded="false"><span class="side-icon">↕</span><span class="side-label">12. Sorting</span><span class="chev">▸</span></button><div class="side-sub"><button class="side-item" data-open="bubble"><span class="side-icon">•</span><span class="side-label">Bubble Sort</span></button><button class="side-item" data-open="selection"><span class="side-icon">•</span><span class="side-label">Selection Sort</span></button><button class="side-item" data-open="insertion"><span class="side-icon">•</span><span class="side-label">Insertion Sort</span></button><button class="side-item" data-open="merge"><span class="side-icon">•</span><span class="side-label">Merge Sort</span></button><button class="side-item" data-open="quick"><span class="side-icon">•</span><span class="side-label">Quick Sort</span></button><button class="side-item" data-open="heapsort"><span class="side-icon">•</span><span class="side-label">Heap Sort</span></button><button class="side-item" data-topic="Comparisons"><span class="side-icon">•</span><span class="side-label">Comparisons</span></button><button class="side-item" data-topic="Swaps"><span class="side-icon">•</span><span class="side-label">Swaps</span></button><button class="side-item" data-topic="Pivot"><span class="side-icon">•</span><span class="side-label">Pivot</span></button><button class="side-item" data-topic="Partitions"><span class="side-icon">•</span><span class="side-label">Partitions</span></button><button class="side-item" data-topic="Merge Process"><span class="side-icon">•</span><span class="side-label">Merge Process</span></button><button class="side-item" data-topic="Sorted Regions"><span class="side-icon">•</span><span class="side-label">Sorted Regions</span></button></div></div><div class="side-group sidebar-section"><button class="disclosure sidebar-disclosure" type="button" aria-expanded="false"><span class="side-icon">⟳</span><span class="side-label">13. Recursion</span><span class="chev">▸</span></button><div class="side-sub"><button class="side-item" data-topic="Recursion Basics"><span class="side-icon">•</span><span class="side-label">Recursion Basics</span></button><button class="side-item" data-open="rec-tree"><span class="side-icon">•</span><span class="side-label">Recursion Tree</span></button><button class="side-item" data-open="rec-factorial"><span class="side-icon">•</span><span class="side-label">Factorial</span></button><button class="side-item" data-open="rec-fibonacci"><span class="side-icon">•</span><span class="side-label">Fibonacci</span></button><button class="side-item" data-open="rec-hanoi"><span class="side-icon">•</span><span class="side-label">Tower of Hanoi</span></button></div></div><div class="side-group sidebar-section"><button class="disclosure sidebar-disclosure" type="button" aria-expanded="false"><span class="side-icon">↻</span><span class="side-label">14. Advanced Linked List</span><span class="chev">▸</span></button><div class="side-sub"><button class="side-item" data-topic="Fast &amp; Slow Pointer"><span class="side-icon">•</span><span class="side-label">Fast &amp; Slow Pointer</span></button><button class="side-item" data-topic="Cycle Detection in Linked List"><span class="side-icon">•</span><span class="side-label">Cycle Detection</span></button><button class="side-item" data-topic="List Reversal"><span class="side-icon">•</span><span class="side-label">List Reversal</span></button><button class="side-item" data-topic="Merge Two Sorted Lists"><span class="side-icon">•</span><span class="side-label">Merge Two Sorted Lists</span></button></div></div><div class="side-group sidebar-section"><button class="disclosure sidebar-disclosure" type="button" aria-expanded="false"><span class="side-icon">⚖</span><span class="side-label">15. AVL Tree</span><span class="chev">▸</span></button><div class="side-sub"><button class="side-item" data-open="avl"><span class="side-icon">•</span><span class="side-label">Height / Balancing</span></button><button class="side-item" data-topic="Balance Factor"><span class="side-icon">•</span><span class="side-label">Balance Factor</span></button><button class="side-item" data-topic="LL Rotation"><span class="side-icon">•</span><span class="side-label">LL Rotation</span></button><button class="side-item" data-topic="RR Rotation"><span class="side-icon">•</span><span class="side-label">RR Rotation</span></button><button class="side-item" data-topic="LR Rotation"><span class="side-icon">•</span><span class="side-label">LR Rotation</span></button><button class="side-item" data-topic="RL Rotation"><span class="side-icon">•</span><span class="side-label">RL Rotation</span></button><button class="side-item" data-topic="AVL Insertion"><span class="side-icon">•</span><span class="side-label">Insertion</span></button><button class="side-item" data-topic="AVL Deletion"><span class="side-icon">•</span><span class="side-label">Deletion</span></button></div></div><div class="side-group sidebar-section"><button class="disclosure sidebar-disclosure" type="button" aria-expanded="false"><span class="side-icon">⋮</span><span class="side-label">More Topics</span><span class="chev">▸</span></button><div class="side-sub"><button class="side-item" data-topic="Backtracking"><span class="side-icon">•</span><span class="side-label">Backtracking</span></button><button class="side-item" data-topic="N-Queens"><span class="side-icon">•</span><span class="side-label">N-Queens</span></button><button class="side-item" data-topic="Sudoku"><span class="side-icon">•</span><span class="side-label">Sudoku</span></button><button class="side-item" data-topic="Maze Solving"><span class="side-icon">•</span><span class="side-label">Maze Solving</span></button><button class="side-item" data-topic="Subsets"><span class="side-icon">•</span><span class="side-label">Subsets</span></button><button class="side-item" data-topic="Permutations"><span class="side-icon">•</span><span class="side-label">Permutations</span></button><button class="side-item" data-topic="Dynamic Programming"><span class="side-icon">•</span><span class="side-label">Dynamic Programming</span></button><button class="side-item" data-topic="Greedy Algorithms"><span class="side-icon">•</span><span class="side-label">Greedy Algorithms</span></button><button class="side-item" data-topic="Divide and Conquer"><span class="side-icon">•</span><span class="side-label">Divide and Conquer</span></button><button class="side-item" data-topic="Bit Manipulation"><span class="side-icon">•</span><span class="side-label">Bit Manipulation</span></button><button class="side-item" data-topic="String Algorithms"><span class="side-icon">•</span><span class="side-label">String Algorithms</span></button><button class="side-item" data-topic="Disjoint Set / Union-Find"><span class="side-icon">•</span><span class="side-label">Disjoint Set / Union-Find</span></button><button class="side-item" data-topic="Segment Tree"><span class="side-icon">•</span><span class="side-label">Segment Tree</span></button><button class="side-item" data-topic="Fenwick Tree / BIT"><span class="side-icon">•</span><span class="side-label">Fenwick Tree / BIT</span></button><button class="side-item" data-topic="Topological Sort"><span class="side-icon">•</span><span class="side-label">Topological Sort</span></button><button class="side-item" data-topic="Strongly Connected Components"><span class="side-icon">•</span><span class="side-label">Strongly Connected Components</span></button><button class="side-item" data-topic="Bellman-Ford"><span class="side-icon">•</span><span class="side-label">Bellman-Ford</span></button><button class="side-item" data-topic="Floyd-Warshall"><span class="side-icon">•</span><span class="side-label">Floyd-Warshall</span></button></div></div></aside><main class="main"><section class="view active" id="view-home"><div class="hero"><div class="hero-grid-bg"></div><div class="hero-content"><div><div class="eyebrow-free"><span class="dot"></span> Free · runs entirely in your browser</div><h1>See algorithms.<br>Understand <span class="grad">algorithms</span>.<br>Master DSA.</h1><p class="hero-sub">Every comparison, swap, and pointer move — animated, explained in plain language, and traced back to the exact line of code that caused it.</p><div class="hero-actions"><button class="btn btn-primary" onclick="goNav('workspace')">▶ Start Visualizing</button><button class="btn btn-ghost" onclick="goNav('algorithms')">Explore Algorithms</button><button class="btn btn-ghost" onclick="goNav('learning')">Practice DSA</button><button class="btn btn-ghost" onclick="openChallenge()">Challenge</button></div><div class="stats-row"><div><div class="stat-num">20+</div><div class="stat-lbl">DSA topics</div></div><div><div class="stat-num">30+</div><div class="stat-lbl">Algorithms</div></div><div><div class="stat-num">Step-by-step</div><div class="stat-lbl">Execution model</div></div><div><div class="stat-num">Live</div><div class="stat-lbl">Interactive animation</div></div></div></div><div class="hero-preview"><div class="hero-preview-head"><span>quickSort.js — running</span><div class="mini-dots"><i style="background:#ef4444"></i><i style="background:#f5a623"></i><i style="background:#34d399"></i></div></div><div class="hero-bars" id="heroBars"></div></div></div></div><section class="section"><div class="section-head"><h2>Popular visualizations</h2><p>Jump straight into the ones students open first.</p></div><div class="card-grid" id="popularGrid"></div></section><section class="section" style="padding-top:0;"><div class="section-head"><h2>Choose your learning path</h2><p>Choose how you want to learn: build foundations, prepare for interviews, or learn concepts progressively.</p></div><div class="path-grid"><button class="path-card" type="button" onclick="selectAlgo('array'); goNav('workspace')"><span class="path-kicker">FOUNDATIONS · 20–30 MIN</span><strong>Start with Arrays &amp; Stacks</strong><span>Understand indexed access, LIFO, FIFO and the core operations before moving to algorithms.</span><em>Start path →</em></button><button class="path-card" type="button" onclick="selectAlgo('binary-search'); goNav('workspace')"><span class="path-kicker">INTERVIEW · 30–40 MIN</span><strong>Master Search &amp; Sort</strong><span>See comparisons, swaps, pivots and shrinking search ranges one operation at a time.</span><em>Practice path →</em></button><button class="path-card" type="button" onclick="goNav('learning')"><span class="path-kicker">LEARN · PROGRESSIVE</span><strong>Learn with Learning Mode</strong><span>Understand concepts step by step with simple explanations and quick checks before opening the full visualizer.</span><em>Start learning →</em></button></div></section><section class="section" style="padding-top:0;"><div class="section-head"><h2>How it works</h2><p>The same three-part loop drives every algorithm in this app.</p></div><div class="how-grid"><div class="how-card"><div class="how-num">01</div><h4>Pick a structure or algorithm</h4><p style="color:var(--text-1); font-size:13.5px; margin-top:8px; line-height:1.6;">Choose from the sidebar, generate or type your own data, and set how large the dataset should be.</p></div><div class="how-card"><div class="how-num">02</div><h4>Step through the execution</h4><p style="color:var(--text-1); font-size:13.5px; margin-top:8px; line-height:1.6;">Play, pause, or move one operation at a time. Each step highlights the exact code line responsible.</p></div><div class="how-card"><div class="how-num">03</div><h4>Read the "why", not just the "what"</h4><p style="color:var(--text-1); font-size:13.5px; margin-top:8px; line-height:1.6;">The explanation panel narrates intent — not just "swap 2 and 3" but why the algorithm decided to.</p></div></div></section><section class="section" style="padding-top:0;"><div class="section-head"><h2>Why visualize DSA?</h2><p>Reading pseudocode teaches syntax. Watching it run teaches intuition.</p></div><div class="card-grid"><div class="card" style="cursor:default;"><div class="card-icon">◈</div><h4>Builds mental models</h4><p>Seeing a pivot split an array makes recursion click faster than any diagram.</p></div><div class="card" style="cursor:default;"><div class="card-icon">◈</div><h4>Connects code to behavior</h4><p>Watching a highlighted line fire alongside a swap closes the gap between reading and running code.</p></div><div class="card" style="cursor:default;"><div class="card-icon">◈</div><h4>Makes complexity tangible</h4><p>O(n²) stops being an abstract symbol once you've watched it grind through 40 elements.</p></div></div></section><section class="section" style="padding-top:0;"><div class="section-head"><h2>Complexity explorer</h2><p>Toggle growth curves to see how running time scales with input size.</p></div><div class="complexity-explorer" id="complexityExplorer"><div class="ce-toolbar"><div class="ce-chips" id="ceChips"></div><button class="ce-zoom-hint" id="ceZoomHint" type="button" title="Click the graph to enlarge it">↗ Click graph to zoom</button></div><div class="ce-chart-wrap" id="ceChartWrap"><canvas id="ceCanvas" aria-label="Interactive time complexity graph. Click to enlarge."></canvas></div></div></section><section class="section" style="padding-top:0;"><div class="section-head"><h2>Learning &amp; Challenge modes</h2><p>Go deeper with guided learning or test yourself with interactive challenges.</p></div><div class="how-grid"><div class="how-card"><h4>🎓 Learning Mode</h4><p style="color:var(--text-1); font-size:13.5px; margin-top:8px; line-height:1.6;">Concepts are introduced progressively with plain-language analogies before the full visualization runs.</p><button class="btn btn-ghost btn-sm" style="margin-top:14px;" onclick="goNav('learning')">Open Learning Mode</button></div><div class="how-card"><h4>🏆 Challenge Mode</h4><p style="color:var(--text-1); font-size:13.5px; margin-top:8px; line-height:1.6;">Predict the next step before it happens. Build a streak, raise the difficulty, beat your best score.</p><button class="btn btn-ghost btn-sm" style="margin-top:14px;" onclick="openChallenge()">Open Challenge Mode</button></div></div></section><footer><div>© 2026 DSA Visualizer — an educational, portfolio project.</div><div>Built with vanilla JS, SVG &amp; CSS · No frameworks required to run</div></footer></section><section class="view" id="view-algorithms"><div class="section"><div class="section-head"><h2>Algorithms</h2><p>Select any algorithm to open it directly in the visualizer workspace.</p></div><div class="section-head"><h4 style="font-size:13px;color:var(--text-2);text-transform:uppercase;letter-spacing:.05em;">Searching</h4></div><div class="card-grid" id="catSearch"></div><div style="height:26px;"></div><div class="section-head"><h4 style="font-size:13px;color:var(--text-2);text-transform:uppercase;letter-spacing:.05em;">Sorting</h4></div><div class="card-grid" id="catSort"></div><div style="height:26px;"></div><div class="section-head"><h4 style="font-size:13px;color:var(--text-2);text-transform:uppercase;letter-spacing:.05em;">Graph, Tree &amp; Advanced Algorithms</h4></div><div class="card-grid" id="catSoon"></div></div></section><section class="view" id="view-datastructures"><div class="section"><div class="section-head"><h2>Data Structures</h2><p>Arrays, linked lists, stacks, queues, trees, heaps, graphs and advanced structures are interactive.</p></div><div class="card-grid" id="catDS"></div></div></section><section class="view" id="view-about"><div class="section"><div class="section-head"><h2>About this project</h2><p>DSA Visualizer turns algorithm execution into something you can watch, pause, rewind, and question. Every algorithm is implemented as a pure step generator — it never touches the screen directly. A single animation engine consumes those steps to drive the canvas, the code highlight, and the explanation panel in lockstep, which is what makes the code ↔ visualization link exact rather than approximate.</p></div><div class="how-grid"><div class="how-card"><h4>Frontend</h4><p style="color:var(--text-1); font-size:13.5px; margin-top:8px;">HTML / CSS / vanilla JS in this build (designed to map directly onto a React + TypeScript + Vite + Tailwind stack).</p></div><div class="how-card"><h4>Animation</h4><p style="color:var(--text-1); font-size:13.5px; margin-top:8px;">CSS transitions + a structured step queue — swappable for Framer Motion / D3 without touching algorithm logic.</p></div><div class="how-card"><h4>Architecture</h4><p style="color:var(--text-1); font-size:13.5px; margin-top:8px;">AlgorithmEngine → StepManager → AnimationController → ExplanationEngine, each independently testable.</p></div></div></div></section><section class="view" id="view-learning"><div class="section"><div class="learning-shell"><div class="learning-hero"><div class="learning-hero-top"><div class="learning-hero-copy"><div class="learning-kicker">GUIDED DSA LEARNING · LEARN + VISUALIZE</div><h2>Build your DSA skills <span class="grad">step by step.</span></h2><p>Start with a guided lesson, test your understanding, then jump straight into the interactive visualizer. Prefer exploring on your own? The Data Structure Lab below gives you every structure already implemented in this visualizer.</p><div class="learning-hero-actions"><button class="btn btn-primary btn-sm" type="button" onclick="switchLearningView('course')">Start guided lessons</button><button class="btn btn-ghost btn-sm" type="button" onclick="switchLearningView('structures')">Explore data structures</button></div></div><div class="learning-progress-box"><div class="learning-progress-top"><span>Course progress</span><b id="learningProgressText">0 / 0</b></div><div class="learning-progress-track"><div class="learning-progress-fill" id="learningProgressFill"></div></div><div style="font-size:10.5px;color:var(--text-2);margin-top:8px;" id="learningProgressHint">Start your first lesson.</div><button class="btn btn-ghost btn-sm" type="button" style="margin-top:12px;width:100%;justify-content:center;" onclick="switchLearningView('course')">Continue learning →</button></div></div><div class="learning-stat-row"><div class="learning-stat"><strong id="learningStatLessons">13</strong><span>guided lessons</span></div><div class="learning-stat"><strong id="learningStatDS">0</strong><span>data structures</span></div><div class="learning-stat"><strong>1 → 1</strong><span>learn → visualize</span></div><div class="learning-stat"><strong>Saved</strong><span>progress in your browser</span></div></div></div><div class="learning-tabs" role="tablist" aria-label="Learning mode views"><button class="learning-tab active" id="learningTabCourse" type="button" role="tab" aria-selected="true" onclick="switchLearningView('course')">📚 Guided path</button><button class="learning-tab" id="learningTabStructures" type="button" role="tab" aria-selected="false" onclick="switchLearningView('structures')">🧩 Data Structure Lab</button></div><div id="learningPanelCourse" class="learning-panel active"><div class="learning-mobile-nav"><button class="btn btn-ghost btn-sm" type="button" onclick="toggleLearningOutline()">☰ Lessons</button></div><div class="learning-layout"><aside class="learning-sidebar" id="learningSidebar"><div class="learning-sidebar-head"><strong>Your learning path</strong><button type="button" onclick="resetLearningProgress()">Reset</button></div><div id="learningOutline"></div></aside><main class="learning-main"><div id="learningLesson"></div></main></div></div><div id="learningPanelStructures" class="learning-panel"><div class="learning-library-shell"><div class="learning-library-head"><div><div class="learning-kicker">INTERACTIVE LIBRARY</div><h3>Every data structure. One click away.</h3><p>Each card shows the kind of structure you are working with and opens its dedicated interactive visualizer. Use this as a visual reference while learning, then experiment with operations yourself.</p></div><div class="learning-library-count" id="learningLibraryCount">0 structures</div></div><div id="learningLibrary"></div></div></div></div></div></section><section class="view" id="view-challenges"><div class="section"><div class="section-head"><h2>Challenges</h2><p>Test your DSA knowledge with interactive questions, MCQs, and algorithm-based challenges.</p></div><div class="card-grid"><div class="how-card"><div class="how-num">01</div><h4>DSA Fundamentals</h4><p style="color:var(--text-1);font-size:13.5px;margin-top:8px;line-height:1.6;">Practice complexity, recursion, arrays, and core DSA concepts.</p><button class="btn btn-ghost btn-sm" style="margin-top:14px;" type="button" onclick="startChallenge('fundamentals')">Start Challenge</button></div><div class="how-card"><div class="how-num">02</div><h4>Algorithms</h4><p style="color:var(--text-1);font-size:13.5px;margin-top:8px;line-height:1.6;">Test your understanding of searching, sorting, trees, and graphs.</p><button class="btn btn-ghost btn-sm" style="margin-top:14px;" type="button" onclick="startChallenge('algorithms')">Start Challenge</button></div><div class="how-card"><div class="how-num">03</div><h4>MCQ Challenge</h4><p style="color:var(--text-1);font-size:13.5px;margin-top:8px;line-height:1.6;">Multiple-choice questions with scores, streaks, and explanations.</p><button class="btn btn-ghost btn-sm" style="margin-top:14px;" type="button" onclick="startChallenge('mcq')">Start Challenge</button></div></div></div></section><section class="view" id="view-workspace"><div class="workspace"><div class="ws-header"><div class="ws-header-left"><div class="ws-eyebrow">INTERACTIVE VISUALIZER</div><h3 id="wsTitle">Choose an algorithm</h3><span class="ws-live"><i></i> Live steps</span></div><div class="ws-header-actions"><button class="wbtn header-action" id="shareBtn" type="button" title="Copy a shareable link">↗ Share</button><button class="wbtn header-action" id="homeWorkspaceBtn" type="button" title="Return to home">⌂ Home</button></div></div><div class="ws-controls-row" id="wsControlsRow" style="display:none;"></div><div class="legend" id="legendBar"></div><div class="ws-canvas-card"><div id="canvasArea"><div class="canvas-bg-grid"></div><div id="canvasContent"></div><div class="viz-mobile-zoom-hint" id="vizMobileZoomHint">PINCH WITH TWO FINGERS TO ZOOM</div></div><div class="viz-live-explain" id="vizLiveExplain" aria-live="polite"><div class="viz-live-main"><div class="viz-live-kicker"><span class="viz-live-dot"></span> LIVE EXPLANATION</div><div class="viz-live-text" id="vizLiveText">Choose a DSA topic, then press Next or Play to follow each step here.</div><div class="viz-live-why" id="vizLiveWhy"></div></div><div class="viz-voice-controls"><span class="viz-voice-status" id="vizVoiceStatus">ENGLISH VOICE</span><button class="viz-voice-btn" id="vizVoiceMute" type="button" aria-pressed="false" title="Mute voice assistant">🔊 <span>Mute</span></button></div></div></div><div class="ws-progress-row"><span class="step-counter" id="stepCounter">Step 0 / 0</span><div class="progress-track" id="progressTrack"><div class="progress-fill" id="progressFill"></div></div></div><div class="ws-transport-row"><div class="transport"><button class="ctrl-btn" id="btnRestart" title="Restart">⟲</button><button class="ctrl-btn" id="btnPrev" title="Previous step">⏮</button><button class="ctrl-btn play" id="btnPlay" title="Play / Pause">▶</button><button class="ctrl-btn" id="btnNext" title="Next step">⏭</button><button class="ctrl-btn" id="btnRandom" title="Randomize data">🔀</button></div><div class="speed-group"><label>Speed</label><div class="speed-pills" id="speedPills"><button class="speed-pill" data-speed="0">0.25x</button><button class="speed-pill" data-speed="1">0.5x</button><button class="speed-pill active" data-speed="2">1x</button><button class="speed-pill" data-speed="3">2x</button></div></div></div><div class="ws-tabs" id="wsTabs"><button class="active" data-side="explain"><span>💬</span><b>Explanation</b><small>What happens</small></button><button data-side="code"><span>&lt;/&gt;</span><b>Code</b><small>See the logic</small></button><button data-side="input"><span>☰</span><b>Input</b><small>Change data</small></button><button data-side="complexity"><span>📖</span><b>Info</b><small>Complexity & facts</small></button></div><div class="side-panel-body" id="sidePanelBody"></div></div></section></main></div></div><div class="toast-wrap" id="toastWrap"></div>
+
+<style id="performance-only-overrides">
+/* Performance-only safeguards: preserve the existing visual design while keeping
+   scrolling and mobile drawer transitions on their own compositor layers. */
+.main{
+  -webkit-overflow-scrolling:touch;
+  overscroll-behavior-y:contain;
+  scroll-behavior:auto;
+  touch-action:auto;
+}
+@media (max-width:980px){
+  .sidebar{
+    height:calc(100vh - 57px);
+    height:calc(100dvh - 57px);
+    bottom:auto;
+    will-change:transform;
+    backface-visibility:hidden;
+    transform:translate3d(-105%,0,0);
+    transition:transform .22s cubic-bezier(.4,0,.2,1);
+    contain:paint;
+  }
+  .sidebar.mobile-open{transform:translate3d(0,0,0);}
+  .sidebar-scrim{
+    height:calc(100vh - 57px);
+    height:calc(100dvh - 57px);
+    bottom:auto;
+    will-change:opacity;
+    contain:paint;
+  }
+  .menu-drawer{
+    height:100vh;
+    height:100dvh;
+    bottom:auto;
+    will-change:transform;
+    backface-visibility:hidden;
+    contain:paint;
+  }
+  .menu-overlay{height:100vh;height:100dvh;bottom:auto;will-change:opacity;contain:paint;}
+}
+body.is-scrolling::before,body.is-scrolling::after{animation-play-state:paused !important;}
+.sidebar.is-scrolling .sidebar-heading{backdrop-filter:none !important;-webkit-backdrop-filter:none !important;}
+</style>
+</head><body><div class="scroll-progress" id="scrollProgress" aria-hidden="true"><span></span></div><canvas id="networkCanvas" aria-hidden="true"></canvas><div class="app-shell"><nav class="navbar"><div class="nav-left"><button class="icon-btn hamburger" id="hamburgerBtn" aria-label="Toggle DSA roadmap sidebar" title="Toggle DSA roadmap sidebar">☰</button><button class="brand" id="brandHomeBtn" type="button" aria-label="Go to home page"><span class="brand-mark">◆</span> DSA Visualizer</button></div><div class="nav-right"><button class="search-btn" id="searchBtn" type="button" aria-expanded="false" aria-controls="searchPanel" title="Search DSA structures">⌕ <span>Search</span></button><button class="menu-btn" id="menuBtn" type="button" aria-expanded="false" aria-controls="menuDrawer">☰ <span>Menu</span></button></div></nav><div class="search-panel" id="searchPanel" aria-hidden="true"><div class="search-panel-head"><div><div class="search-title">Find DSA</div><div class="search-subtitle">Search structures, algorithms, and topics</div></div><button class="icon-btn search-close" id="searchCloseBtn" type="button" aria-label="Close search">×</button></div><div class="search-input-wrap"><span>⌕</span><input id="dsaSearchInput" type="search" autocomplete="off" placeholder="e.g. Binary Tree, Stack, BFS..." aria-label="Search DSA topics"><button id="searchClearBtn" class="search-clear" type="button" aria-label="Clear search">×</button></div><div class="search-results" id="searchResults" role="listbox" aria-label="DSA search results"></div></div><div class="menu-overlay" id="menuOverlay" aria-hidden="true"></div><aside class="menu-drawer" id="menuDrawer" aria-hidden="true"><div class="menu-drawer-head"><h3>Menu</h3><button class="icon-btn menu-close" id="menuCloseBtn" type="button" aria-label="Close menu">×</button></div><nav class="menu-nav" id="navLinks" aria-label="Main navigation"><button data-nav="home" class="active"><span>⌂</span> Home</button><button data-nav="challenges" ><span>◆</span> Challenges</button><button data-nav="algorithms"><span>↕</span> Algorithms</button><button data-nav="datastructures"><span>▦</span> Data Structures</button><button data-nav="learning"><span>◉</span> Learning</button><button data-nav="about"><span>ⓘ</span> About</button></nav><div class="menu-drawer-actions"><a class="gh-btn" href="https://github.com/" target="_blank" rel="noopener noreferrer">★ GitHub</a><button class="menu-theme-btn" id="themeToggle" type="button" aria-label="Toggle theme" title="Toggle light/dark theme"><span class="theme-icon">☾</span><span>Theme</span></button></div><div class="menu-motion-note"><span class="motion-orb"></span><div><b>Interactive motion</b><small>Hover, tilt, click and scroll — the UI reacts.</small></div></div></aside><div class="body-grid"><div class="sidebar-scrim" id="sidebarScrim" aria-hidden="true"></div><aside class="sidebar collapsed" id="sidebar"><div class="sidebar-heading"><span class="roadmap-title">DSA ROADMAP</span><span class="roadmap-sub">LEARN • VISUALIZE • MASTER</span><div class="side-group sidebar-section"><button class="disclosure sidebar-disclosure" type="button" aria-expanded="false"><span class="side-icon">◌</span><span class="side-label">1. DSA Fundamentals</span><span class="chev">▸</span></button><div class="side-sub"><button class="side-item" data-topic="What is Data Structure?"><span class="side-icon">•</span><span class="side-label">What is Data Structure?</span></button><button class="side-item" data-topic="What is Algorithm?"><span class="side-icon">•</span><span class="side-label">What is Algorithm?</span></button><button class="side-item" data-topic="Time Complexity"><span class="side-icon">•</span><span class="side-label">Time Complexity</span></button><button class="side-item" data-topic="Space Complexity"><span class="side-icon">•</span><span class="side-label">Space Complexity</span></button><button class="side-item" data-topic="Big-O"><span class="side-icon">•</span><span class="side-label">Big-O</span></button><button class="side-item" data-topic="Big-Theta"><span class="side-icon">•</span><span class="side-label">Big-Theta</span></button><button class="side-item" data-topic="Big-Omega"><span class="side-icon">•</span><span class="side-label">Big-Omega</span></button><button class="side-item" data-topic="Recursion"><span class="side-icon">•</span><span class="side-label">Recursion</span></button><button class="side-item" data-topic="Iteration"><span class="side-icon">•</span><span class="side-label">Iteration</span></button></div></div><div class="side-group sidebar-section"><button class="disclosure sidebar-disclosure" type="button" aria-expanded="false"><span class="side-icon">▦</span><span class="side-label">2. Arrays</span><span class="chev">▸</span></button><div class="side-sub"><button class="side-item" data-topic="1D Array"><span class="side-icon">•</span><span class="side-label">1D Array</span></button><button class="side-item" data-topic="2D Array"><span class="side-icon">•</span><span class="side-label">2D Array</span></button><button class="side-item" data-topic="Array Traversal"><span class="side-icon">•</span><span class="side-label">Traversal</span></button><button class="side-item" data-topic="Array Insertion"><span class="side-icon">•</span><span class="side-label">Insertion</span></button><button class="side-item" data-topic="Array Deletion"><span class="side-icon">•</span><span class="side-label">Deletion</span></button><button class="side-item" data-topic="Prefix Sum"><span class="side-icon">•</span><span class="side-label">Prefix Sum</span></button><button class="side-item" data-topic="Two Pointer Technique"><span class="side-icon">•</span><span class="side-label">Two Pointer Technique</span></button><button class="side-item" data-topic="Three Sum"><span class="side-icon">•</span><span class="side-label">Three Sum</span></button><button class="side-item" data-topic="Sliding Window"><span class="side-icon">•</span><span class="side-label">Sliding Window</span></button></div></div><div class="side-group sidebar-section"><button class="disclosure sidebar-disclosure" type="button" aria-expanded="false"><span class="side-icon">⇄</span><span class="side-label">3. Linked Lists</span><span class="chev">▸</span></button><div class="side-sub"><button class="side-item" data-open="sll"><span class="side-icon">•</span><span class="side-label">Singly Linked List</span></button><button class="side-item" data-open="dll"><span class="side-icon">•</span><span class="side-label">Doubly Linked List</span></button><button class="side-item" data-open="cll"><span class="side-icon">•</span><span class="side-label">Circular Linked List</span></button><button class="side-item" data-topic="Linked List Traversal"><span class="side-icon">•</span><span class="side-label">Traversal</span></button><button class="side-item" data-topic="Linked List Insertion"><span class="side-icon">•</span><span class="side-label">Insertion</span></button><button class="side-item" data-topic="Linked List Deletion"><span class="side-icon">•</span><span class="side-label">Deletion</span></button><button class="side-item" data-topic="Linked List Searching"><span class="side-icon">•</span><span class="side-label">Searching</span></button><button class="side-item" data-topic="List Reversal"><span class="side-icon">•</span><span class="side-label">Reversal</span></button><button class="side-item" data-topic="Fast &amp; Slow Pointer"><span class="side-icon">•</span><span class="side-label">Fast &amp; Slow Pointer</span></button></div></div><div class="side-group sidebar-section"><button class="disclosure sidebar-disclosure" type="button" aria-expanded="false"><span class="side-icon">▤</span><span class="side-label">4. Stack</span><span class="chev">▸</span></button><div class="side-sub"><button class="side-item" data-open="stack"><span class="side-icon">•</span><span class="side-label">Stack using Array</span></button><button class="side-item" data-open="stack-linked"><span class="side-icon">•</span><span class="side-label">Stack using Linked List</span></button><button class="side-item" data-topic="Push"><span class="side-icon">•</span><span class="side-label">Push</span></button><button class="side-item" data-topic="Pop"><span class="side-icon">•</span><span class="side-label">Pop</span></button><button class="side-item" data-topic="Peek"><span class="side-icon">•</span><span class="side-label">Peek</span></button><button class="side-item" data-topic="Stack Applications"><span class="side-icon">•</span><span class="side-label">Applications</span></button><button class="side-item" data-topic="Parentheses Matching"><span class="side-icon">•</span><span class="side-label">Parentheses Matching</span></button><button class="side-item" data-topic="Infix"><span class="side-icon">•</span><span class="side-label">Infix</span></button><button class="side-item" data-topic="Prefix"><span class="side-icon">•</span><span class="side-label">Prefix</span></button><button class="side-item" data-topic="Postfix"><span class="side-icon">•</span><span class="side-label">Postfix</span></button></div></div><div class="side-group sidebar-section"><button class="disclosure sidebar-disclosure" type="button" aria-expanded="false"><span class="side-icon">▥</span><span class="side-label">5. Queue</span><span class="chev">▸</span></button><div class="side-sub"><button class="side-item" data-open="queue"><span class="side-icon">•</span><span class="side-label">Simple Queue</span></button><button class="side-item" data-open="queue-circular"><span class="side-icon">•</span><span class="side-label">Circular Queue</span></button><button class="side-item" data-open="queue-linked"><span class="side-icon">•</span><span class="side-label">Queue using Linked List</span></button><button class="side-item" data-open="deque"><span class="side-icon">•</span><span class="side-label">Deque</span></button><button class="side-item" data-open="priority-queue"><span class="side-icon">•</span><span class="side-label">Priority Queue</span></button><button class="side-item" data-topic="Enqueue"><span class="side-icon">•</span><span class="side-label">Enqueue</span></button><button class="side-item" data-topic="Dequeue"><span class="side-icon">•</span><span class="side-label">Dequeue</span></button></div></div><div class="side-group sidebar-section"><button class="disclosure sidebar-disclosure" type="button" aria-expanded="false"><span class="side-icon">#</span><span class="side-label">6. Hashing</span><span class="chev">▸</span></button><div class="side-sub"><button class="side-item" data-open="hash"><span class="side-icon">•</span><span class="side-label">Hash Table</span></button><button class="side-item" data-topic="Hash Function"><span class="side-icon">•</span><span class="side-label">Hash Function</span></button><button class="side-item" data-topic="Collision"><span class="side-icon">•</span><span class="side-label">Collision</span></button><button class="side-item" data-topic="Chaining"><span class="side-icon">•</span><span class="side-label">Chaining</span></button><button class="side-item" data-topic="Open Addressing"><span class="side-icon">•</span><span class="side-label">Open Addressing</span></button><button class="side-item" data-topic="Linear Probing"><span class="side-icon">•</span><span class="side-label">Linear Probing</span></button><button class="side-item" data-topic="Hash Searching"><span class="side-icon">•</span><span class="side-label">Searching</span></button><button class="side-item" data-topic="Hash Insertion"><span class="side-icon">•</span><span class="side-label">Insertion</span></button><button class="side-item" data-topic="Hash Deletion"><span class="side-icon">•</span><span class="side-label">Deletion</span></button></div></div><div class="side-group sidebar-section"><button class="disclosure sidebar-disclosure" type="button" aria-expanded="false"><span class="side-icon">▲</span><span class="side-label">7. Trees</span><span class="chev">▸</span></button><div class="side-sub"><button class="side-item" data-topic="Tree Terminology"><span class="side-icon">•</span><span class="side-label">Tree Terminology</span></button><button class="side-item" data-open="btree"><span class="side-icon">•</span><span class="side-label">Binary Tree</span></button><button class="side-item" data-topic="Full Binary Tree"><span class="side-icon">•</span><span class="side-label">Full Binary Tree</span></button><button class="side-item" data-topic="Complete Binary Tree"><span class="side-icon">•</span><span class="side-label">Complete Binary Tree</span></button><button class="side-item" data-topic="Perfect Binary Tree"><span class="side-icon">•</span><span class="side-label">Perfect Binary Tree</span></button><button class="side-item" data-topic="Balanced Tree"><span class="side-icon">•</span><span class="side-label">Balanced Tree</span></button><button class="side-item" data-open="bst"><span class="side-icon">•</span><span class="side-label">Binary Search Tree</span></button><button class="side-item" data-topic="BST Searching"><span class="side-icon">•</span><span class="side-label">BST Searching</span></button><button class="side-item" data-topic="BST Insertion"><span class="side-icon">•</span><span class="side-label">BST Insertion</span></button><button class="side-item" data-topic="BST Deletion"><span class="side-icon">•</span><span class="side-label">BST Deletion</span></button></div></div><div class="side-group sidebar-section"><button class="disclosure sidebar-disclosure" type="button" aria-expanded="false"><span class="side-icon">↕</span><span class="side-label">8. Tree Traversals</span><span class="chev">▸</span></button><div class="side-sub"><button class="side-item" data-open="inorder"><span class="side-icon">•</span><span class="side-label">Inorder</span></button><button class="side-item" data-open="preorder"><span class="side-icon">•</span><span class="side-label">Preorder</span></button><button class="side-item" data-open="postorder"><span class="side-icon">•</span><span class="side-label">Postorder</span></button><button class="side-item" data-open="levelorder"><span class="side-icon">•</span><span class="side-label">Level Order</span></button><button class="side-item" data-open="tree-recursive"><span class="side-icon">•</span><span class="side-label">Recursive Traversal</span></button><button class="side-item" data-open="tree-iterative"><span class="side-icon">•</span><span class="side-label">Iterative Traversal</span></button></div></div><div class="side-group sidebar-section"><button class="disclosure sidebar-disclosure" type="button" aria-expanded="false"><span class="side-icon">◆</span><span class="side-label">9. Heap</span><span class="chev">▸</span></button><div class="side-sub"><button class="side-item" data-open="heap"><span class="side-icon">•</span><span class="side-label">Heap Concept</span></button><button class="side-item" data-topic="Min Heap"><span class="side-icon">•</span><span class="side-label">Min Heap</span></button><button class="side-item" data-topic="Max Heap"><span class="side-icon">•</span><span class="side-label">Max Heap</span></button><button class="side-item" data-topic="Heapify"><span class="side-icon">•</span><span class="side-label">Heapify</span></button><button class="side-item" data-topic="Heap Insert"><span class="side-icon">•</span><span class="side-label">Insert</span></button><button class="side-item" data-topic="Heap Delete"><span class="side-icon">•</span><span class="side-label">Delete</span></button><button class="side-item" data-topic="Extract Min"><span class="side-icon">•</span><span class="side-label">Extract Min</span></button><button class="side-item" data-topic="Extract Max"><span class="side-icon">•</span><span class="side-label">Extract Max</span></button><button class="side-item" data-topic="Heap Priority Queue"><span class="side-icon">•</span><span class="side-label">Priority Queue</span></button></div></div><div class="side-group sidebar-section"><button class="disclosure sidebar-disclosure" type="button" aria-expanded="false"><span class="side-icon">◎</span><span class="side-label">10. Graphs</span><span class="chev">▸</span></button><div class="side-sub"><button class="side-item" data-open="graph"><span class="side-icon">•</span><span class="side-label">Graph Terminology</span></button><button class="side-item" data-topic="Directed Graph"><span class="side-icon">•</span><span class="side-label">Directed Graph</span></button><button class="side-item" data-topic="Undirected Graph"><span class="side-icon">•</span><span class="side-label">Undirected Graph</span></button><button class="side-item" data-topic="Weighted Graph"><span class="side-icon">•</span><span class="side-label">Weighted Graph</span></button><button class="side-item" data-topic="Adjacency Matrix"><span class="side-icon">•</span><span class="side-label">Adjacency Matrix</span></button><button class="side-item" data-topic="Adjacency List"><span class="side-icon">•</span><span class="side-label">Adjacency List</span></button><button class="side-item" data-open="bfs"><span class="side-icon">•</span><span class="side-label">BFS</span></button><button class="side-item" data-open="dfs"><span class="side-icon">•</span><span class="side-label">DFS</span></button><button class="side-item" data-topic="Connected Components"><span class="side-icon">•</span><span class="side-label">Connected Components</span></button><button class="side-item" data-topic="Cycle Detection"><span class="side-icon">•</span><span class="side-label">Cycle Detection</span></button></div></div><div class="side-group sidebar-section"><button class="disclosure sidebar-disclosure" type="button" aria-expanded="false"><span class="side-icon">⌕</span><span class="side-label">11. Searching</span><span class="chev">▸</span></button><div class="side-sub"><button class="side-item" data-open="linear-search"><span class="side-icon">•</span><span class="side-label">Linear Search</span></button><button class="side-item" data-open="binary-search"><span class="side-icon">•</span><span class="side-label">Binary Search</span></button><button class="side-item" data-open="jump-search"><span class="side-icon">•</span><span class="side-label">Jump Search</span></button></div></div><div class="side-group sidebar-section"><button class="disclosure sidebar-disclosure" type="button" aria-expanded="false"><span class="side-icon">↕</span><span class="side-label">12. Sorting</span><span class="chev">▸</span></button><div class="side-sub"><button class="side-item" data-open="bubble"><span class="side-icon">•</span><span class="side-label">Bubble Sort</span></button><button class="side-item" data-open="selection"><span class="side-icon">•</span><span class="side-label">Selection Sort</span></button><button class="side-item" data-open="insertion"><span class="side-icon">•</span><span class="side-label">Insertion Sort</span></button><button class="side-item" data-open="merge"><span class="side-icon">•</span><span class="side-label">Merge Sort</span></button><button class="side-item" data-open="quick"><span class="side-icon">•</span><span class="side-label">Quick Sort</span></button><button class="side-item" data-open="heapsort"><span class="side-icon">•</span><span class="side-label">Heap Sort</span></button><button class="side-item" data-topic="Comparisons"><span class="side-icon">•</span><span class="side-label">Comparisons</span></button><button class="side-item" data-topic="Swaps"><span class="side-icon">•</span><span class="side-label">Swaps</span></button><button class="side-item" data-topic="Pivot"><span class="side-icon">•</span><span class="side-label">Pivot</span></button><button class="side-item" data-topic="Partitions"><span class="side-icon">•</span><span class="side-label">Partitions</span></button><button class="side-item" data-topic="Merge Process"><span class="side-icon">•</span><span class="side-label">Merge Process</span></button><button class="side-item" data-topic="Sorted Regions"><span class="side-icon">•</span><span class="side-label">Sorted Regions</span></button></div></div><div class="side-group sidebar-section"><button class="disclosure sidebar-disclosure" type="button" aria-expanded="false"><span class="side-icon">⟳</span><span class="side-label">13. Recursion</span><span class="chev">▸</span></button><div class="side-sub"><button class="side-item" data-topic="Recursion Basics"><span class="side-icon">•</span><span class="side-label">Recursion Basics</span></button><button class="side-item" data-open="rec-tree"><span class="side-icon">•</span><span class="side-label">Recursion Tree</span></button><button class="side-item" data-open="rec-factorial"><span class="side-icon">•</span><span class="side-label">Factorial</span></button><button class="side-item" data-open="rec-fibonacci"><span class="side-icon">•</span><span class="side-label">Fibonacci</span></button><button class="side-item" data-open="rec-hanoi"><span class="side-icon">•</span><span class="side-label">Tower of Hanoi</span></button></div></div><div class="side-group sidebar-section"><button class="disclosure sidebar-disclosure" type="button" aria-expanded="false"><span class="side-icon">↻</span><span class="side-label">14. Advanced Linked List</span><span class="chev">▸</span></button><div class="side-sub"><button class="side-item" data-topic="Fast &amp; Slow Pointer"><span class="side-icon">•</span><span class="side-label">Fast &amp; Slow Pointer</span></button><button class="side-item" data-topic="Cycle Detection in Linked List"><span class="side-icon">•</span><span class="side-label">Cycle Detection</span></button><button class="side-item" data-topic="List Reversal"><span class="side-icon">•</span><span class="side-label">List Reversal</span></button><button class="side-item" data-topic="Merge Two Sorted Lists"><span class="side-icon">•</span><span class="side-label">Merge Two Sorted Lists</span></button></div></div><div class="side-group sidebar-section"><button class="disclosure sidebar-disclosure" type="button" aria-expanded="false"><span class="side-icon">⚖</span><span class="side-label">15. AVL Tree</span><span class="chev">▸</span></button><div class="side-sub"><button class="side-item" data-open="avl"><span class="side-icon">•</span><span class="side-label">Height / Balancing</span></button><button class="side-item" data-topic="Balance Factor"><span class="side-icon">•</span><span class="side-label">Balance Factor</span></button><button class="side-item" data-topic="LL Rotation"><span class="side-icon">•</span><span class="side-label">LL Rotation</span></button><button class="side-item" data-topic="RR Rotation"><span class="side-icon">•</span><span class="side-label">RR Rotation</span></button><button class="side-item" data-topic="LR Rotation"><span class="side-icon">•</span><span class="side-label">LR Rotation</span></button><button class="side-item" data-topic="RL Rotation"><span class="side-icon">•</span><span class="side-label">RL Rotation</span></button><button class="side-item" data-topic="AVL Insertion"><span class="side-icon">•</span><span class="side-label">Insertion</span></button><button class="side-item" data-topic="AVL Deletion"><span class="side-icon">•</span><span class="side-label">Deletion</span></button></div></div><div class="side-group sidebar-section"><button class="disclosure sidebar-disclosure" type="button" aria-expanded="false"><span class="side-icon">⋮</span><span class="side-label">More Topics</span><span class="chev">▸</span></button><div class="side-sub"><button class="side-item" data-topic="Backtracking"><span class="side-icon">•</span><span class="side-label">Backtracking</span></button><button class="side-item" data-topic="N-Queens"><span class="side-icon">•</span><span class="side-label">N-Queens</span></button><button class="side-item" data-topic="Sudoku"><span class="side-icon">•</span><span class="side-label">Sudoku</span></button><button class="side-item" data-topic="Maze Solving"><span class="side-icon">•</span><span class="side-label">Maze Solving</span></button><button class="side-item" data-topic="Subsets"><span class="side-icon">•</span><span class="side-label">Subsets</span></button><button class="side-item" data-topic="Permutations"><span class="side-icon">•</span><span class="side-label">Permutations</span></button><button class="side-item" data-topic="Dynamic Programming"><span class="side-icon">•</span><span class="side-label">Dynamic Programming</span></button><button class="side-item" data-topic="Greedy Algorithms"><span class="side-icon">•</span><span class="side-label">Greedy Algorithms</span></button><button class="side-item" data-topic="Divide and Conquer"><span class="side-icon">•</span><span class="side-label">Divide and Conquer</span></button><button class="side-item" data-topic="Bit Manipulation"><span class="side-icon">•</span><span class="side-label">Bit Manipulation</span></button><button class="side-item" data-topic="String Algorithms"><span class="side-icon">•</span><span class="side-label">String Algorithms</span></button><button class="side-item" data-topic="Disjoint Set / Union-Find"><span class="side-icon">•</span><span class="side-label">Disjoint Set / Union-Find</span></button><button class="side-item" data-topic="Segment Tree"><span class="side-icon">•</span><span class="side-label">Segment Tree</span></button><button class="side-item" data-topic="Fenwick Tree / BIT"><span class="side-icon">•</span><span class="side-label">Fenwick Tree / BIT</span></button><button class="side-item" data-topic="Topological Sort"><span class="side-icon">•</span><span class="side-label">Topological Sort</span></button><button class="side-item" data-topic="Strongly Connected Components"><span class="side-icon">•</span><span class="side-label">Strongly Connected Components</span></button><button class="side-item" data-topic="Bellman-Ford"><span class="side-icon">•</span><span class="side-label">Bellman-Ford</span></button><button class="side-item" data-topic="Floyd-Warshall"><span class="side-icon">•</span><span class="side-label">Floyd-Warshall</span></button></div></div></aside><main class="main"><section class="view active" id="view-home"><div class="hero"><div class="hero-grid-bg"></div><div class="hero-content"><div><div class="eyebrow-free"><span class="dot"></span> Free · runs entirely in your browser</div><h1>See algorithms.<br>Understand <span class="grad">algorithms</span>.<br>Master DSA.</h1><p class="hero-sub">Every comparison, swap, and pointer move — animated, explained in plain language, and traced back to the exact line of code that caused it.</p><div class="hero-actions"><button class="btn btn-primary" onclick="goNav('workspace')">▶ Start Visualizing</button><button class="btn btn-ghost" onclick="goNav('algorithms')">Explore Algorithms</button><button class="btn btn-ghost" onclick="goNav('learning')">Practice DSA</button><button class="btn btn-ghost" onclick="openChallenge()">Challenge</button></div><div class="stats-row"><div><div class="stat-num">20+</div><div class="stat-lbl">DSA topics</div></div><div><div class="stat-num">30+</div><div class="stat-lbl">Algorithms</div></div><div><div class="stat-num">Step-by-step</div><div class="stat-lbl">Execution model</div></div><div><div class="stat-num">Live</div><div class="stat-lbl">Interactive animation</div></div></div></div><div class="hero-preview"><div class="hero-preview-head"><span>quickSort.js — running</span><div class="mini-dots"><i style="background:#ef4444"></i><i style="background:#f5a623"></i><i style="background:#34d399"></i></div></div><div class="hero-bars" id="heroBars"></div></div></div></div><section class="section"><div class="section-head"><h2>Popular visualizations</h2><p>Jump straight into the ones students open first.</p></div><div class="card-grid" id="popularGrid"></div></section><section class="section" style="padding-top:0;"><div class="section-head"><h2>Choose your learning path</h2><p>Choose how you want to learn: build foundations, prepare for interviews, or learn concepts progressively.</p></div><div class="path-grid"><button class="path-card" type="button" onclick="selectAlgo('array'); goNav('workspace')"><span class="path-kicker">FOUNDATIONS · 20–30 MIN</span><strong>Start with Arrays &amp; Stacks</strong><span>Understand indexed access, LIFO, FIFO and the core operations before moving to algorithms.</span><em>Start path →</em></button><button class="path-card" type="button" onclick="selectAlgo('binary-search'); goNav('workspace')"><span class="path-kicker">INTERVIEW · 30–40 MIN</span><strong>Master Search &amp; Sort</strong><span>See comparisons, swaps, pivots and shrinking search ranges one operation at a time.</span><em>Practice path →</em></button><button class="path-card" type="button" onclick="goNav('learning')"><span class="path-kicker">LEARN · PROGRESSIVE</span><strong>Learn with Learning Mode</strong><span>Understand concepts step by step with simple explanations and quick checks before opening the full visualizer.</span><em>Start learning →</em></button></div></section><section class="section" style="padding-top:0;"><div class="section-head"><h2>How it works</h2><p>The same three-part loop drives every algorithm in this app.</p></div><div class="how-grid"><div class="how-card"><div class="how-num">01</div><h4>Pick a structure or algorithm</h4><p style="color:var(--text-1); font-size:13.5px; margin-top:8px; line-height:1.6;">Choose from the sidebar, generate or type your own data, and set how large the dataset should be.</p></div><div class="how-card"><div class="how-num">02</div><h4>Step through the execution</h4><p style="color:var(--text-1); font-size:13.5px; margin-top:8px; line-height:1.6;">Play, pause, or move one operation at a time. Each step highlights the exact code line responsible.</p></div><div class="how-card"><div class="how-num">03</div><h4>Read the "why", not just the "what"</h4><p style="color:var(--text-1); font-size:13.5px; margin-top:8px; line-height:1.6;">The explanation panel narrates intent — not just "swap 2 and 3" but why the algorithm decided to.</p></div></div></section><section class="section" style="padding-top:0;"><div class="section-head"><h2>Why visualize DSA?</h2><p>Reading pseudocode teaches syntax. Watching it run teaches intuition.</p></div><div class="card-grid"><div class="card" style="cursor:default;"><div class="card-icon">◈</div><h4>Builds mental models</h4><p>Seeing a pivot split an array makes recursion click faster than any diagram.</p></div><div class="card" style="cursor:default;"><div class="card-icon">◈</div><h4>Connects code to behavior</h4><p>Watching a highlighted line fire alongside a swap closes the gap between reading and running code.</p></div><div class="card" style="cursor:default;"><div class="card-icon">◈</div><h4>Makes complexity tangible</h4><p>O(n²) stops being an abstract symbol once you've watched it grind through 40 elements.</p></div></div></section><section class="section" style="padding-top:0;"><div class="section-head"><h2>Complexity explorer</h2><p>Toggle growth curves to see how running time scales with input size.</p></div><div class="complexity-explorer" id="complexityExplorer"><div class="ce-toolbar"><div class="ce-chips" id="ceChips"></div><button class="ce-zoom-hint" id="ceZoomHint" type="button" title="Click the graph to enlarge it">↗ Click graph to zoom</button></div><div class="ce-chart-wrap" id="ceChartWrap"><canvas id="ceCanvas" aria-label="Interactive time complexity graph. Click to enlarge."></canvas></div></div></section><section class="section" style="padding-top:0;"><div class="section-head"><h2>Learning &amp; Challenge modes</h2><p>Go deeper with guided learning or test yourself with interactive challenges.</p></div><div class="how-grid"><div class="how-card"><h4>🎓 Learning Mode</h4><p style="color:var(--text-1); font-size:13.5px; margin-top:8px; line-height:1.6;">Concepts are introduced progressively with plain-language analogies before the full visualization runs.</p><button class="btn btn-ghost btn-sm" style="margin-top:14px;" onclick="goNav('learning')">Open Learning Mode</button></div><div class="how-card"><h4>🏆 Challenge Mode</h4><p style="color:var(--text-1); font-size:13.5px; margin-top:8px; line-height:1.6;">Predict the next step before it happens. Build a streak, raise the difficulty, beat your best score.</p><button class="btn btn-ghost btn-sm" style="margin-top:14px;" onclick="openChallenge()">Open Challenge Mode</button></div></div></section><footer><div>© 2026 DSA Visualizer — an educational, portfolio project.</div><div>Built with vanilla JS, SVG &amp; CSS · No frameworks required to run</div></footer></section><section class="view" id="view-algorithms"><div class="section"><div class="section-head"><h2>Algorithms</h2><p>Select any algorithm to open it directly in the visualizer workspace.</p></div><div class="section-head"><h4 style="font-size:13px;color:var(--text-2);text-transform:uppercase;letter-spacing:.05em;">Searching</h4></div><div class="card-grid" id="catSearch"></div><div style="height:26px;"></div><div class="section-head"><h4 style="font-size:13px;color:var(--text-2);text-transform:uppercase;letter-spacing:.05em;">Sorting</h4></div><div class="card-grid" id="catSort"></div><div style="height:26px;"></div><div class="section-head"><h4 style="font-size:13px;color:var(--text-2);text-transform:uppercase;letter-spacing:.05em;">Graph, Tree &amp; Advanced Algorithms</h4></div><div class="card-grid" id="catSoon"></div></div></section><section class="view" id="view-datastructures"><div class="section"><div class="section-head"><h2>Data Structures</h2><p>Arrays, linked lists, stacks, queues, trees, heaps, graphs and advanced structures are interactive.</p></div><div class="card-grid" id="catDS"></div></div></section><section class="view" id="view-about"><div class="section"><div class="section-head"><h2>About this project</h2><p>DSA Visualizer turns algorithm execution into something you can watch, pause, rewind, and question. Every algorithm is implemented as a pure step generator — it never touches the screen directly. A single animation engine consumes those steps to drive the canvas, the code highlight, and the explanation panel in lockstep, which is what makes the code ↔ visualization link exact rather than approximate.</p></div><div class="how-grid"><div class="how-card"><h4>Frontend</h4><p style="color:var(--text-1); font-size:13.5px; margin-top:8px;">HTML / CSS / vanilla JS in this build (designed to map directly onto a React + TypeScript + Vite + Tailwind stack).</p></div><div class="how-card"><h4>Animation</h4><p style="color:var(--text-1); font-size:13.5px; margin-top:8px;">CSS transitions + a structured step queue — swappable for Framer Motion / D3 without touching algorithm logic.</p></div><div class="how-card"><h4>Architecture</h4><p style="color:var(--text-1); font-size:13.5px; margin-top:8px;">AlgorithmEngine → StepManager → AnimationController → ExplanationEngine, each independently testable.</p></div></div></div></section><section class="view" id="view-learning"><div class="section"><div class="learning-shell"><div class="learning-hero"><div class="learning-hero-top"><div class="learning-hero-copy"><div class="learning-kicker">GUIDED DSA LEARNING · LEARN + VISUALIZE</div><h2>Build your DSA skills <span class="grad">step by step.</span></h2><p>Start with a guided lesson, test your understanding, then jump straight into the interactive visualizer. Prefer exploring on your own? The Data Structure Lab below gives you every structure already implemented in this visualizer.</p><div class="learning-hero-actions"><button class="btn btn-primary btn-sm" type="button" onclick="switchLearningView('course')">Start guided lessons</button><button class="btn btn-ghost btn-sm" type="button" onclick="switchLearningView('structures')">Explore data structures</button></div></div><div class="learning-progress-box"><div class="learning-progress-top"><span>Course progress</span><b id="learningProgressText">0 / 0</b></div><div class="learning-progress-track"><div class="learning-progress-fill" id="learningProgressFill"></div></div><div style="font-size:10.5px;color:var(--text-2);margin-top:8px;" id="learningProgressHint">Start your first lesson.</div><button class="btn btn-ghost btn-sm" type="button" style="margin-top:12px;width:100%;justify-content:center;" onclick="switchLearningView('course')">Continue learning →</button></div></div><div class="learning-stat-row"><div class="learning-stat"><strong id="learningStatLessons">13</strong><span>guided lessons</span></div><div class="learning-stat"><strong id="learningStatDS">0</strong><span>data structures</span></div><div class="learning-stat"><strong>1 → 1</strong><span>learn → visualize</span></div><div class="learning-stat"><strong>Saved</strong><span>progress in your browser</span></div></div></div><div class="learning-tabs" role="tablist" aria-label="Learning mode views"><button class="learning-tab active" id="learningTabCourse" type="button" role="tab" aria-selected="true" onclick="switchLearningView('course')">📚 Guided path</button><button class="learning-tab" id="learningTabStructures" type="button" role="tab" aria-selected="false" onclick="switchLearningView('structures')">🧩 Data Structure Lab</button></div><div id="learningPanelCourse" class="learning-panel active"><div class="learning-mobile-nav"><button class="btn btn-ghost btn-sm" type="button" onclick="toggleLearningOutline()">☰ Lessons</button></div><div class="learning-layout"><aside class="learning-sidebar" id="learningSidebar"><div class="learning-sidebar-head"><strong>Your learning path</strong><button type="button" onclick="resetLearningProgress()">Reset</button></div><div id="learningOutline"></div></aside><main class="learning-main"><div id="learningLesson"></div></main></div></div><div id="learningPanelStructures" class="learning-panel"><div class="learning-library-shell"><div class="learning-library-head"><div><div class="learning-kicker">INTERACTIVE LIBRARY</div><h3>Every data structure. One click away.</h3><p>Each card shows the kind of structure you are working with and opens its dedicated interactive visualizer. Use this as a visual reference while learning, then experiment with operations yourself.</p></div><div class="learning-library-count" id="learningLibraryCount">0 structures</div></div><div id="learningLibrary"></div></div></div></div></div></section><section class="view" id="view-challenges"><div class="section"><div class="section-head"><h2>Challenges</h2><p>Test your DSA knowledge with interactive questions, MCQs, and algorithm-based challenges.</p></div><div class="card-grid"><div class="how-card"><div class="how-num">01</div><h4>DSA Fundamentals</h4><p style="color:var(--text-1);font-size:13.5px;margin-top:8px;line-height:1.6;">Practice complexity, recursion, arrays, and core DSA concepts.</p><button class="btn btn-ghost btn-sm" style="margin-top:14px;" type="button" onclick="startChallenge('fundamentals')">Start Challenge</button></div><div class="how-card"><div class="how-num">02</div><h4>Algorithms</h4><p style="color:var(--text-1);font-size:13.5px;margin-top:8px;line-height:1.6;">Test your understanding of searching, sorting, trees, and graphs.</p><button class="btn btn-ghost btn-sm" style="margin-top:14px;" type="button" onclick="startChallenge('algorithms')">Start Challenge</button></div><div class="how-card"><div class="how-num">03</div><h4>MCQ Challenge</h4><p style="color:var(--text-1);font-size:13.5px;margin-top:8px;line-height:1.6;">Multiple-choice questions with scores, streaks, and explanations.</p><button class="btn btn-ghost btn-sm" style="margin-top:14px;" type="button" onclick="startChallenge('mcq')">Start Challenge</button></div></div></div></section><section class="view" id="view-workspace"><div class="workspace"><div class="ws-header"><div class="ws-header-left"><div class="ws-eyebrow">INTERACTIVE VISUALIZER</div><h3 id="wsTitle">Choose an algorithm</h3><span class="ws-live"><i></i> Live steps</span></div><div class="ws-header-actions"><button class="wbtn header-action" id="shareBtn" type="button" title="Copy a shareable link">↗ Share</button><button class="wbtn header-action" id="homeWorkspaceBtn" type="button" title="Return to home">⌂ Home</button></div></div><div class="ws-controls-row" id="wsControlsRow" style="display:none;"></div><div class="legend" id="legendBar"></div><div class="ws-canvas-card"><div id="canvasArea"><div class="canvas-bg-grid"></div><div id="canvasContent"></div><div class="viz-mobile-zoom-hint" id="vizMobileZoomHint">PINCH WITH TWO FINGERS TO ZOOM</div></div><div class="viz-live-explain" id="vizLiveExplain" aria-live="polite"><div class="viz-live-main"><div class="viz-live-kicker"><span class="viz-live-dot"></span> LIVE EXPLANATION</div><div class="viz-live-text" id="vizLiveText">Choose a DSA topic, then press Next or Play to follow each step here.</div><div class="viz-live-why" id="vizLiveWhy"></div></div><div class="viz-voice-controls"><span class="viz-voice-status" id="vizVoiceStatus">ENGLISH VOICE</span><button class="viz-voice-btn" id="vizVoiceMute" type="button" aria-pressed="false" title="Mute voice assistant">🔊 <span>Mute</span></button></div></div></div><div class="ws-progress-row"><span class="step-counter" id="stepCounter">Step 0 / 0</span><div class="progress-track" id="progressTrack"><div class="progress-fill" id="progressFill"></div></div></div><div class="ws-transport-row"><div class="transport"><button class="ctrl-btn" id="btnRestart" title="Restart">⟲</button><button class="ctrl-btn" id="btnPrev" title="Previous step">⏮</button><button class="ctrl-btn play" id="btnPlay" title="Play / Pause">▶</button><button class="ctrl-btn" id="btnNext" title="Next step">⏭</button><button class="ctrl-btn" id="btnRandom" title="Randomize data">🔀</button></div><div class="speed-group"><label>Speed</label><div class="speed-pills" id="speedPills"><button class="speed-pill" data-speed="0">0.25x</button><button class="speed-pill" data-speed="1">0.5x</button><button class="speed-pill active" data-speed="2">1x</button><button class="speed-pill" data-speed="3">2x</button></div></div></div><div class="ws-tabs" id="wsTabs"><button class="active" data-side="explain"><span>💬</span><b>Explanation</b><small>What happens</small></button><button data-side="code"><span>&lt;/&gt;</span><b>Code</b><small>See the logic</small></button><button data-side="input"><span>☰</span><b>Input</b><small>Change data</small></button><button data-side="complexity"><span>📖</span><b>Info</b><small>Complexity & facts</small></button></div><div class="side-panel-body" id="sidePanelBody"></div></div></section></main></div></div><div class="toast-wrap" id="toastWrap"></div>
 
 <script>
 /* ======================================================================
@@ -5331,10 +5368,7 @@ function drawComplexityOn(canvas, H=320){
   ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
   ctx.clearRect(0, 0, W, H);
 
-  // Give the Y-axis labels their own lane so they never collide with the
-  // vertical axis title, on both desktop and narrow/mobile canvases.
-  const narrow = W < 500;
-  const pad = {top:24, right:narrow ? 82 : 78, bottom:42, left:narrow ? 72 : 68};
+  const pad = {top:24, right:72, bottom:42, left:58};
   const plotW = Math.max(1, W - pad.left - pad.right);
   const plotH = Math.max(1, H - pad.top - pad.bottom);
   const maxN = 50;
@@ -5362,9 +5396,8 @@ function drawComplexityOn(canvas, H=320){
   ctx.lineWidth = 1;
   ctx.strokeStyle = border;
   ctx.fillStyle = text2;
-  ctx.font = narrow ? '10px monospace' : '11px monospace';
+  ctx.font = '11px monospace';
   ctx.textBaseline = 'middle';
-  ctx.textAlign = 'right';
   for(let i=0;i<=5;i++){
     const ratio = i / 5;
     const y = pad.top + plotH * ratio;
@@ -5373,11 +5406,9 @@ function drawComplexityOn(canvas, H=320){
     ctx.globalAlpha = 1;
     const exponent = maxLogY * (1 - ratio);
     const labelValue = Math.max(0, Math.round(Math.pow(10, exponent) - 1));
-    const tickLabel = labelValue >= 1000 ? labelValue.toExponential(1).replace('+','') : String(labelValue);
-    ctx.fillText(tickLabel, pad.left - 10, y);
+    ctx.fillText(labelValue >= 1000 ? labelValue.toExponential(0) : String(labelValue), 8, y);
   }
 
-  ctx.textAlign = 'start';
   ctx.textBaseline = 'alphabetic';
   [1,10,20,30,40,50].forEach(n=>{
     const x = pad.left + plotW * ((n-1)/(maxN-1));
@@ -5422,14 +5453,12 @@ function drawComplexityOn(canvas, H=320){
   });
 
   ctx.fillStyle = text2;
-  ctx.font = narrow ? '10px monospace' : '11px monospace';
+  ctx.font = '11px monospace';
   ctx.textBaseline='alphabetic';
-  ctx.textAlign = 'start';
   ctx.fillText('input size (n) →', Math.max(pad.left, W-150), H-3);
   ctx.save();
-  ctx.translate(narrow ? 12 : 14, pad.top + plotH/2);
+  ctx.translate(15, pad.top + plotH/2);
   ctx.rotate(-Math.PI/2);
-  ctx.textAlign = 'center';
   ctx.fillText('relative operations · log scale', 0, 0);
   ctx.restore();
 
@@ -9878,14 +9907,6 @@ document.addEventListener('keydown', (e)=>{
   const reduced=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const $$=(sel,root=document)=>Array.from(root.querySelectorAll(sel));
 
-  // Soft spotlight follows the pointer on desktop.
-  if(!reduced && window.matchMedia('(hover:hover) and (pointer:fine)').matches){
-    window.addEventListener('pointermove',e=>{
-      document.documentElement.style.setProperty('--mx',e.clientX+'px');
-      document.documentElement.style.setProperty('--my',e.clientY+'px');
-    },{passive:true});
-  }
-
   // Navbar depth after scrolling.
   const nav=document.querySelector('.navbar');
   const syncNav=()=>nav&&nav.classList.toggle('scrolled',window.scrollY>8);
@@ -12575,7 +12596,19 @@ class ActivitySelection {
   const body=document.body;
   if(!body) return;
 
-  /* Cursor-following background lighting was intentionally removed for performance. */
+  /* Keep desktop card shine effects, but do not track the global pointer. */
+  const finePointer=window.matchMedia?.('(hover:hover) and (pointer:fine)');
+  if(finePointer?.matches && !reduced){
+    document.addEventListener('pointermove',(e)=>{
+      const el=e.target?.closest?.('.card,.path-card,.how-card,.fund-card,.panel-block');
+      if(!el)return;
+      const r=el.getBoundingClientRect();
+      if(!r.width||!r.height)return;
+      el.style.setProperty('--card-x',((e.clientX-r.left)/r.width*100)+'%');
+      el.style.setProperty('--card-y',((e.clientY-r.top)/r.height*100)+'%');
+    },{passive:true});
+  }
+
   /* Reusable ripple for interactive controls. Existing ripple nodes are reused. */
   function ripple(e){
     const b=e.currentTarget;
@@ -12935,197 +12968,112 @@ class ActivitySelection {
 
 <script id="ambient-network-bg">
 (function(){
-  const canvas = document.getElementById('networkCanvas');
+  const canvas=document.getElementById('networkCanvas');
   if(!canvas || !canvas.getContext) return;
-  const ctx = canvas.getContext('2d', { alpha:true, desynchronized:true }) || canvas.getContext('2d');
+  const ctx=canvas.getContext('2d',{alpha:true,desynchronized:true});
   if(!ctx) return;
-
-  const reduceMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
-  let W=0,H=0;
-  /* Cap DPR to keep large/retina canvases from becoming needlessly expensive. */
-  let DPR=Math.min(window.devicePixelRatio||1,1.5);
+  const reduceMotion=window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+  let W=0,H=0,DPR=Math.min(window.devicePixelRatio||1,1.5);
   let particles=[];
-  let rafId=null, running=false;
-  let scrollPaused=false;
-  const LINK_DIST=128;
-  const LINK_DIST2=LINK_DIST*LINK_DIST;
-  const CELL=LINK_DIST;
+  let rafId=0,running=false;
+  let rgb=[];
 
   function hexToRgb(hex){
     hex=(hex||'#ff633f').trim().replace('#','');
     if(hex.length===3) hex=hex.split('').map(c=>c+c).join('');
-    const num=parseInt(hex,16)||0xff3d1f;
-    return [(num>>16)&255,(num>>8)&255,num&255];
+    const n=parseInt(hex,16)||0xff633f;
+    return [(n>>16)&255,(n>>8)&255,n&255];
   }
-
-  let RGB=[];
-  function refreshNetworkColors(){
+  function refreshColors(){
     const cs=getComputedStyle(document.documentElement);
-    RGB=[
-      hexToRgb(cs.getPropertyValue('--accent')),
-      hexToRgb(cs.getPropertyValue('--accent-2'))
-    ];
-    for(const p of particles){
-      p.c=RGB[p.cIndex];
-      p.rgb=`${p.c[0]},${p.c[1]},${p.c[2]}`;
-    }
+    rgb=[hexToRgb(cs.getPropertyValue('--accent')),hexToRgb(cs.getPropertyValue('--accent-2'))];
+    particles.forEach(p=>{p.color=rgb[p.c];});
   }
-  window.__refreshAmbientNetwork=refreshNetworkColors;
-  window.addEventListener('dsa-theme-changed',refreshNetworkColors);
-
   function countFor(w){
     if(w<560) return 24;
     if(w<900) return 40;
     if(w<1400) return 58;
     return 74;
   }
-
   function makeParticle(){
-    const cIndex=Math.random()<0.5?0:1;
-    const c=RGB[cIndex];
-    return {
-      x:Math.random()*W,
-      y:Math.random()*H,
-      vx:(Math.random()-0.5)*0.18,
-      vy:(Math.random()-0.5)*0.18,
-      r:1.1+Math.random()*1.6,
-      c,
-      cIndex,
-      rgb:`${c[0]},${c[1]},${c[2]}`
-    };
+    const c=Math.random()<.52?0:1;
+    return {x:Math.random()*W,y:Math.random()*H,vx:(Math.random()-.5)*.18,vy:(Math.random()-.5)*.18,r:1.1+Math.random()*1.2,c,color:rgb[c]};
   }
-
   function resize(){
-    W=window.innerWidth;
-    H=window.innerHeight;
-    DPR=Math.min(window.devicePixelRatio||1,1.5);
+    W=Math.max(1,innerWidth); H=Math.max(1,innerHeight);
+    DPR=Math.min(devicePixelRatio||1,1.5);
     canvas.width=Math.max(1,Math.round(W*DPR));
     canvas.height=Math.max(1,Math.round(H*DPR));
-    canvas.style.width=W+'px';
-    canvas.style.height=H+'px';
+    canvas.style.width=W+'px'; canvas.style.height=H+'px';
     ctx.setTransform(DPR,0,0,DPR,0,0);
-
     const target=countFor(W);
-    if(particles.length<target){
-      while(particles.length<target) particles.push(makeParticle());
-    }else if(particles.length>target){
-      particles.length=target;
-    }
-    refreshNetworkColors();
+    while(particles.length<target) particles.push(makeParticle());
+    if(particles.length>target) particles.length=target;
+    refreshColors();
+    drawFrame();
   }
 
-  /* Spatial buckets avoid the O(n²) all-pairs scan during every frame. */
-  const buckets=new Map();
-  function bucketKey(cx,cy){ return cx+'|'+cy; }
-
-  function rebuildBuckets(){
-    buckets.clear();
-    for(let i=0;i<particles.length;i++){
-      const p=particles[i];
-      const cx=Math.floor(p.x/CELL);
-      const cy=Math.floor(p.y/CELL);
-      const key=bucketKey(cx,cy);
-      let list=buckets.get(key);
-      if(!list){ list=[]; buckets.set(key,list); }
-      list.push(i);
-    }
-  }
-
+  const LINK_DIST=128, LINK_D2=LINK_DIST*LINK_DIST;
   function drawFrame(){
     ctx.clearRect(0,0,W,H);
-    rebuildBuckets();
-
+    const paths=[
+      [new Path2D(),new Path2D(),new Path2D(),new Path2D()],
+      [new Path2D(),new Path2D(),new Path2D(),new Path2D()]
+    ];
+    const alphas=[0.035,0.07,0.11,0.15];
     for(let i=0;i<particles.length;i++){
       const a=particles[i];
-      const acx=Math.floor(a.x/CELL);
-      const acy=Math.floor(a.y/CELL);
-
-      for(let ox=-1;ox<=1;ox++){
-        for(let oy=-1;oy<=1;oy++){
-          const list=buckets.get(bucketKey(acx+ox,acy+oy));
-          if(!list) continue;
-          for(const j of list){
-            if(j<=i) continue;
-            const b=particles[j];
-            const dx=a.x-b.x, dy=a.y-b.y;
-            const d2=dx*dx+dy*dy;
-            if(d2>=LINK_DIST2) continue;
-            const alpha=(1-Math.sqrt(d2)/LINK_DIST)*0.16;
-            ctx.strokeStyle=`rgba(${a.rgb},${alpha})`;
-            ctx.lineWidth=1;
-            ctx.beginPath();
-            ctx.moveTo(a.x,a.y);
-            ctx.lineTo(b.x,b.y);
-            ctx.stroke();
-          }
-        }
+      for(let j=i+1;j<particles.length;j++){
+        const b=particles[j];
+        const dx=a.x-b.x,dy=a.y-b.y,d2=dx*dx+dy*dy;
+        if(d2>=LINK_D2) continue;
+        const t=1-Math.sqrt(d2)/LINK_DIST;
+        const bin=t<.25?0:t<.5?1:t<.75?2:3;
+        const p=paths[a.c][bin];
+        p.moveTo(a.x,a.y); p.lineTo(b.x,b.y);
       }
     }
-
-    for(const p of particles){
-      ctx.beginPath();
-      ctx.fillStyle=`rgba(${p.rgb},0.55)`;
-      ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
-      ctx.fill();
+    for(let c=0;c<2;c++) for(let k=0;k<4;k++){
+      const col=rgb[c]||[255,99,63];
+      ctx.strokeStyle=`rgba(${col[0]},${col[1]},${col[2]},${alphas[k]})`;
+      ctx.lineWidth=.9;
+      ctx.stroke(paths[c][k]);
+    }
+    const dots=[new Path2D(),new Path2D()];
+    for(const p of particles) dots[p.c].moveTo(p.x+p.r,p.y),dots[p.c].arc(p.x,p.y,p.r,0,Math.PI*2);
+    for(let c=0;c<2;c++){
+      const col=rgb[c]||[255,99,63];
+      ctx.fillStyle=`rgba(${col[0]},${col[1]},${col[2]},0.5)`;
+      ctx.fill(dots[c]);
     }
   }
-
   function step(){
-    if(!running || scrollPaused){
-      rafId=null;
-      return;
-    }
-
+    if(!running){rafId=0;return;}
     for(const p of particles){
-      p.x+=p.vx;
-      p.y+=p.vy;
-
-      if(p.x<0){p.x=0;p.vx=Math.abs(p.vx);}
-      else if(p.x>W){p.x=W;p.vx=-Math.abs(p.vx);}
-      if(p.y<0){p.y=0;p.vy=Math.abs(p.vy);}
-      else if(p.y>H){p.y=H;p.vy=-Math.abs(p.vy);}
-
-      const sp2=p.vx*p.vx+p.vy*p.vy;
-      if(sp2>0.25){
-        const inv=0.5/Math.sqrt(sp2);
-        p.vx*=inv;
-        p.vy*=inv;
-      }
+      p.x+=p.vx;p.y+=p.vy;
+      if(p.x<0||p.x>W){p.vx*=-1;p.x=Math.max(0,Math.min(W,p.x));}
+      if(p.y<0||p.y>H){p.vy*=-1;p.y=Math.max(0,Math.min(H,p.y));}
     }
-
     drawFrame();
     rafId=requestAnimationFrame(step);
   }
-
   function start(){
-    if(rafId || reduceMotion || scrollPaused) return;
+    if(reduceMotion||running)return;
     running=true;
     rafId=requestAnimationFrame(step);
   }
   function stop(){
     running=false;
-    if(rafId){cancelAnimationFrame(rafId);rafId=null;}
+    if(rafId){cancelAnimationFrame(rafId);rafId=0;}
   }
-  function pauseForScroll(){
-    scrollPaused=true;
-    stop();
-  }
-  function resumeAfterScroll(){
-    scrollPaused=false;
-    if(!document.hidden) start();
-  }
-
-  window.__ambientNetworkControl={start,stop,pauseForScroll,resumeAfterScroll};
-
+  window.__startAmbientNetwork=start;
+  window.__stopAmbientNetwork=stop;
+  window.__refreshAmbientNetwork=refreshColors;
   window.addEventListener('resize',resize,{passive:true});
-  document.addEventListener('visibilitychange',()=>{
-    if(document.hidden) stop();
-    else start();
-  });
-
+  window.addEventListener('dsa-theme-changed',()=>{refreshColors();drawFrame();});
+  document.addEventListener('visibilitychange',()=>document.hidden?stop():start(),{passive:true});
   resize();
-  if(reduceMotion) drawFrame();
-  else start();
+  if(!reduceMotion) start();
 })();
 </script>
 
@@ -13140,9 +13088,14 @@ class ActivitySelection {
   const reduce=window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
   const fine=window.matchMedia?.('(hover:hover) and (pointer:fine)').matches;
 
-  /* Navbar depth only. */
+  /* Reading progress + navbar depth. */
+  const progress=document.querySelector('#scrollProgress span');
   const navbar=document.querySelector('.navbar');
   const syncScroll=()=>{
+    const doc=document.documentElement;
+    const max=Math.max(1,doc.scrollHeight-window.innerHeight);
+    const pct=Math.min(100,Math.max(0,(window.scrollY/max)*100));
+    if(progress)progress.style.width=pct+'%';
     if(navbar)navbar.classList.toggle('scrolled',window.scrollY>10);
   };
   window.addEventListener('scroll',syncScroll,{passive:true});
@@ -13297,43 +13250,34 @@ class ActivitySelection {
 </script>
 
 
-<script id="performance-optimizer">
+<script id="scroll-performance-controller">
 (function(){
   const body=document.body;
+  const main=document.querySelector('.main');
   const sidebar=document.getElementById('sidebar');
-  const network=window.__ambientNetworkControl;
-  if(!body) return;
-
-  let scrollTimer=0;
-  let scrolling=false;
-
-  function beginScrollWork(){
-    if(!scrolling){
-      scrolling=true;
-      body.classList.add('perf-scrolling');
-      network?.pauseForScroll?.();
-    }
-    clearTimeout(scrollTimer);
-    scrollTimer=setTimeout(()=>{
-      scrolling=false;
-      body.classList.remove('perf-scrolling');
-      network?.resumeAfterScroll?.();
-    },120);
+  if(!body)return;
+  let bodyTimer=0,sideTimer=0,scrolling=false;
+  function setScrolling(on){
+    if(scrolling===on)return;
+    scrolling=on;
+    body.classList.toggle('is-scrolling',on);
+    if(on) window.__stopAmbientNetwork?.();
+    else window.__startAmbientNetwork?.();
   }
-
-  window.addEventListener('scroll',beginScrollWork,{passive:true});
-  sidebar?.addEventListener('scroll',beginScrollWork,{passive:true});
-
-  document.addEventListener('visibilitychange',()=>{
-    if(document.hidden){
-      clearTimeout(scrollTimer);
-      scrolling=false;
-      body.classList.remove('perf-scrolling');
-      network?.stop?.();
-    }else{
-      network?.resumeAfterScroll?.();
-    }
-  });
+  function onMainScroll(){
+    setScrolling(true);
+    clearTimeout(bodyTimer);
+    bodyTimer=setTimeout(()=>setScrolling(false),120);
+  }
+  function onSideScroll(){
+    sidebar?.classList.add('is-scrolling');
+    clearTimeout(sideTimer);
+    sideTimer=setTimeout(()=>sidebar?.classList.remove('is-scrolling'),120);
+    setScrolling(true);
+  }
+  main?.addEventListener('scroll',onMainScroll,{passive:true});
+  sidebar?.addEventListener('scroll',onSideScroll,{passive:true});
+  window.addEventListener('blur',()=>setScrolling(false),{passive:true});
 })();
 </script>
 </body></html>
