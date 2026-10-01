@@ -3933,6 +3933,282 @@ html, body{
 }
 </style>
 
+
+<style id="heap-mobile-final-pan-fix">
+@media (max-width:700px){
+  .heap-ref-zoom-surface.is-heap-zoomed{
+    overflow-x:auto !important;
+    overflow-y:visible !important;
+    -webkit-overflow-scrolling:touch;
+    touch-action:pan-x pan-y !important;
+  }
+
+  .heap-ref-zoom-surface:not(.is-heap-zoomed){
+    overflow-x:hidden !important;
+    touch-action:pan-y !important;
+  }
+}
+</style>
+
+
+<style id="heap-clean-mobile-compact-final">
+/* ================================================================
+   HEAP-ONLY PRESENTATION
+   Compact title/rule + binary tree + small array.
+   No other data structure is affected.
+================================================================ */
+#view-workspace #canvasContent:has(.heap-reference-shell) .heap-reference-shell{
+  width:100% !important;
+  max-width:980px !important;
+  margin:0 auto !important;
+}
+
+/* Remove the extra guide pills/header layer. */
+#view-workspace #canvasContent:has(.heap-reference-shell) .heap-ref-head-compact{
+  width:100% !important;
+  max-width:980px !important;
+  min-height:0 !important;
+  padding:11px 14px !important;
+  margin:0 auto 10px !important;
+  display:flex !important;
+  align-items:center !important;
+  justify-content:space-between !important;
+  gap:18px !important;
+  border-radius:13px !important;
+}
+
+#view-workspace #canvasContent:has(.heap-reference-shell) .heap-ref-head-main{
+  min-width:0;
+}
+
+#view-workspace #canvasContent:has(.heap-reference-shell) .heap-ref-head-main h2{
+  font-size:20px !important;
+  line-height:1.1 !important;
+}
+
+#view-workspace #canvasContent:has(.heap-reference-shell) .heap-ref-head-main p{
+  margin-top:3px !important;
+  font-size:11px !important;
+  line-height:1.35 !important;
+}
+
+#view-workspace #canvasContent:has(.heap-reference-shell) .heap-ref-rule{
+  min-width:175px !important;
+  padding-left:13px !important;
+  flex:0 0 auto !important;
+}
+
+#view-workspace #canvasContent:has(.heap-reference-shell) .heap-ref-rule small{
+  font-size:9px !important;
+}
+
+#view-workspace #canvasContent:has(.heap-reference-shell) .heap-ref-rule code{
+  font-size:13px !important;
+}
+
+/* Small labels instead of large descriptive strips. */
+#view-workspace #canvasContent:has(.heap-reference-shell) .heap-ref-tree-title-compact{
+  width:min(760px,100%) !important;
+  margin:0 auto 2px !important;
+  padding:0 2px !important;
+  display:flex !important;
+  align-items:baseline !important;
+  justify-content:space-between !important;
+  gap:8px !important;
+}
+
+#view-workspace #canvasContent:has(.heap-reference-shell) .heap-ref-tree-title-compact b,
+#view-workspace #canvasContent:has(.heap-reference-shell) .heap-ref-array-title-compact b{
+  font-size:12px !important;
+}
+
+#view-workspace #canvasContent:has(.heap-reference-shell) .heap-ref-tree-title-compact span{
+  font-size:9px !important;
+}
+
+/* Compact visualization surface. */
+#view-workspace #canvasContent:has(.heap-reference-shell) .heap-ref-zoom-surface{
+  width:min(820px,100%) !important;
+  max-width:820px !important;
+  margin:0 auto !important;
+  overflow-x:hidden !important;
+  overflow-y:visible !important;
+}
+
+#view-workspace #canvasContent:has(.heap-reference-shell) .heap-ref-zoom-content{
+  width:100% !important;
+  max-width:100% !important;
+  margin:0 auto !important;
+}
+
+#view-workspace #canvasContent:has(.heap-reference-shell) .heap-ref-tree{
+  width:760px !important;
+  max-width:760px !important;
+  min-height:300px !important;
+  height:300px !important;
+  margin:0 auto !important;
+  padding:0 !important;
+  overflow:visible !important;
+}
+
+#view-workspace #canvasContent:has(.heap-reference-shell) .heap-ref-tree svg{
+  display:block !important;
+  width:760px !important;
+  max-width:760px !important;
+  height:300px !important;
+  max-height:300px !important;
+  margin:0 auto !important;
+}
+
+/* Small array cells: index + value only. */
+#view-workspace #canvasContent:has(.heap-reference-shell) .heap-ref-array-title-compact{
+  width:min(760px,100%) !important;
+  margin:2px auto 4px !important;
+  padding:0 2px !important;
+}
+
+#view-workspace #canvasContent:has(.heap-reference-shell) .heap-ref-array{
+  width:min(760px,100%) !important;
+  max-width:760px !important;
+  margin:0 auto !important;
+  display:grid !important;
+  grid-template-columns:repeat(8,minmax(0,1fr)) !important;
+  gap:5px !important;
+  transform:none !important;
+  justify-content:stretch !important;
+}
+
+#view-workspace #canvasContent:has(.heap-reference-shell) .heap-ref-cell{
+  width:100% !important;
+  min-width:0 !important;
+  height:47px !important;
+  min-height:47px !important;
+  padding:5px 3px !important;
+  border-radius:8px !important;
+}
+
+#view-workspace #canvasContent:has(.heap-reference-shell) .heap-ref-cell small{
+  font-size:7px !important;
+  line-height:1 !important;
+}
+
+#view-workspace #canvasContent:has(.heap-reference-shell) .heap-ref-cell b{
+  font-size:14px !important;
+  line-height:1.1 !important;
+}
+
+/* No extra status panel in the compact visualization. */
+#view-workspace #canvasContent:has(.heap-reference-shell) .heap-ref-status{
+  display:none !important;
+}
+
+@media (max-width:700px){
+  #view-workspace #canvasContent:has(.heap-reference-shell) .heap-ref-head-compact{
+    padding:9px 10px !important;
+    margin-bottom:8px !important;
+    gap:10px !important;
+    border-radius:11px !important;
+  }
+
+  #view-workspace #canvasContent:has(.heap-reference-shell) .heap-ref-head-main h2{
+    font-size:17px !important;
+  }
+
+  #view-workspace #canvasContent:has(.heap-reference-shell) .heap-ref-head-main p{
+    font-size:9px !important;
+  }
+
+  #view-workspace #canvasContent:has(.heap-reference-shell) .heap-ref-rule{
+    min-width:0 !important;
+    padding-left:9px !important;
+  }
+
+  #view-workspace #canvasContent:has(.heap-reference-shell) .heap-ref-rule code{
+    font-size:11px !important;
+  }
+
+  #view-workspace #canvasContent:has(.heap-reference-shell) .heap-ref-tree-title-compact{
+    width:100% !important;
+    margin-bottom:1px !important;
+  }
+
+  #view-workspace #canvasContent:has(.heap-reference-shell) .heap-ref-tree-title-compact span{
+    font-size:8px !important;
+  }
+
+  #view-workspace #canvasContent:has(.heap-reference-shell) .heap-ref-zoom-surface{
+    width:100% !important;
+    max-width:100% !important;
+  }
+
+  #view-workspace #canvasContent:has(.heap-reference-shell) .heap-ref-tree{
+    width:100% !important;
+    max-width:100% !important;
+    min-height:270px !important;
+    height:270px !important;
+  }
+
+  #view-workspace #canvasContent:has(.heap-reference-shell) .heap-ref-tree svg{
+    width:100% !important;
+    max-width:100% !important;
+    height:270px !important;
+    max-height:270px !important;
+  }
+
+  #view-workspace #canvasContent:has(.heap-reference-shell) .heap-ref-array{
+    width:100% !important;
+    max-width:100% !important;
+    grid-template-columns:repeat(8,minmax(0,1fr)) !important;
+    gap:4px !important;
+  }
+
+  #view-workspace #canvasContent:has(.heap-reference-shell) .heap-ref-cell{
+    height:43px !important;
+    min-height:43px !important;
+    padding:4px 2px !important;
+    border-radius:7px !important;
+  }
+
+  #view-workspace #canvasContent:has(.heap-reference-shell) .heap-ref-cell small{
+    font-size:6.5px !important;
+  }
+
+  #view-workspace #canvasContent:has(.heap-reference-shell) .heap-ref-cell b{
+    font-size:12px !important;
+  }
+}
+
+@media (max-width:360px){
+  #view-workspace #canvasContent:has(.heap-reference-shell) .heap-ref-head-compact{
+    align-items:flex-start !important;
+  }
+
+  #view-workspace #canvasContent:has(.heap-reference-shell) .heap-ref-rule{
+    padding-left:7px !important;
+  }
+
+  #view-workspace #canvasContent:has(.heap-reference-shell) .heap-ref-cell{
+    height:40px !important;
+    min-height:40px !important;
+  }
+
+  #view-workspace #canvasContent:has(.heap-reference-shell) .heap-ref-cell b{
+    font-size:11px !important;
+  }
+}
+</style>
+
+
+<style id="heap-remove-legacy-meta-final">
+#view-workspace #canvasContent:has(.heap-reference-shell) .heap-ref-meta{
+  display:none !important;
+}
+#view-workspace #canvasContent:has(.heap-reference-shell) .heap-ref-basics,
+#view-workspace #canvasContent:has(.heap-reference-shell) .heap-ref-learn{
+  display:none !important;
+}
+</style>
+
 </head>
 
 <body>
@@ -8177,7 +8453,8 @@ let vizGestureScale = window.innerWidth <= 700 ? 1.08 : 1;
     if(!vizGestureScale || vizGestureScale===1) vizGestureScale=1.08;
     const isLinkedList=Array.isArray(LIST_ALGOS) && LIST_ALGOS.includes(State.algo);
     const isTreeVisualization=!!root.querySelector('.tree-stage, .advanced-stage .tree-stage');
-    root.style.setProperty('--viz-gesture-scale',((isLinkedList || isTreeVisualization) ? 1 : vizGestureScale).toFixed(3));
+    const isHeapVisualization=!!root.querySelector('.heap-reference-shell');
+    root.style.setProperty('--viz-gesture-scale',((isLinkedList || isTreeVisualization || isHeapVisualization) ? 1 : vizGestureScale).toFixed(3));
   },{passive:true});
 
   syncScale();
@@ -11562,19 +11839,13 @@ document.addEventListener('keydown', (e)=>{
     const min=type==='min';
     const title=min?'Min Heap':'Max Heap';
     const rule=min?'parent ≤ children':'parent ≥ children';
-    const basic=heapBeginnerText(st,type,snap);
-    const op=String(st?.op||'READY');
     const shell=document.createElement('div');
     shell.className='heap-reference-shell';
 
     // Top guide strip — intentionally simple and close to the reference layout.
     shell.innerHTML=`
-      <div class="heap-ref-meta">
-        <span>HEAP · BEGINNER GUIDE</span>
-        <span>${State.steps.length} STEPS</span>
-      </div>
-      <div class="heap-ref-head">
-        <div>
+      <div class="heap-ref-head heap-ref-head-compact">
+        <div class="heap-ref-head-main">
           <h2>${title}</h2>
           <p>${min?'Smallest value stays at the root.':'Largest value stays at the root.'}</p>
         </div>
@@ -11583,31 +11854,29 @@ document.addEventListener('keydown', (e)=>{
           <code>${rule}</code>
         </div>
       </div>
-      <div class="heap-ref-tree-title">
-        <div><b>Binary tree view</b><span>See parent and child relationships</span></div>
-        <span class="heap-ref-index-note">Each circle has an array index</span>
+
+      <div class="heap-ref-tree-title heap-ref-tree-title-compact">
+        <b>Binary tree</b>
+        <span>Parent → child relationships</span>
       </div>
+
       <div class="heap-ref-zoom-surface" data-heap-zoom-surface aria-label="Heap visualization. Use two fingers to zoom on a phone">
         <div class="heap-ref-zoom-content" data-heap-zoom-content>
           <div class="heap-ref-tree" id="heapRefTree"></div>
-          <div class="heap-ref-array-title">
-            <b>Same heap stored as an array</b>
-            <span>Tree position ↔ array index</span>
+
+          <div class="heap-ref-array-title heap-ref-array-title-compact">
+            <b>Heap as an array</b>
           </div>
           <div class="heap-ref-array" id="heapRefArray"></div>
         </div>
       </div>
-      <div class="heap-ref-status" id="heapRefStatus"></div>
-    `;
-
+    `
     const treeHost=shell.querySelector('#heapRefTree');
     const arrayHost=shell.querySelector('#heapRefArray');
-    const status=shell.querySelector('#heapRefStatus');
 
     if(!vals.length){
       treeHost.innerHTML='<div class="heap-ref-empty">Heap is empty. Use Add or Run to begin.</div>';
       arrayHost.innerHTML='<div class="heap-ref-empty array-empty">No values yet.</div>';
-      status.textContent='No root yet.';
     }else{
       const mobileHeap=window.innerWidth<=700;
       const desktopWorkspaceWidth = Math.max(
@@ -11616,10 +11885,11 @@ document.addEventListener('keydown', (e)=>{
       );
       /* Desktop: keep the workspace full-width, but keep the actual heap
          diagram compact and centered. */
-      const W=mobileHeap?720:Math.min(900, desktopWorkspaceWidth);
-      const H=mobileHeap?390:320;
-      const nodeRadius=mobileHeap?30:24;
-      const levelGap=mobileHeap?96:72;
+      /* Keep the heap compact on both laptop and phone screens. */
+      const W=mobileHeap?640:760;
+      const H=mobileHeap?270:300;
+      const nodeRadius=mobileHeap?22:24;
+      const levelGap=mobileHeap?58:68;
       const svg=document.createElementNS('http://www.w3.org/2000/svg','svg');
       svg.setAttribute('viewBox',`0 0 ${W} ${H}`);
       svg.setAttribute('preserveAspectRatio','xMidYMid meet');
@@ -11631,7 +11901,7 @@ document.addEventListener('keydown', (e)=>{
         const first=(2**level)-1;
         const pos=i-first;
         const count=2**level;
-        positions[i]={x:W*(pos+0.5)/count,y:50+level*levelGap};
+        positions[i]={x:W*(pos+0.5)/count,y:34+level*levelGap};
       }
 
       // Relationships first, so lines sit behind nodes.
@@ -11671,15 +11941,13 @@ document.addEventListener('keydown', (e)=>{
       vals.forEach((v,i)=>{
         const cell=document.createElement('div');
         const active=idx.includes(i);
-        const role=i===0?'ROOT':(2*i+1<vals.length?'PARENT':'LEAF');
         cell.className=`heap-ref-cell${active?' active':''}${i===0?' root':''}`;
-        cell.innerHTML=`<small>${i}</small><b>${esc(v)}</b><span>${role}</span>`;
+        cell.innerHTML=`<small>${i}</small><b>${esc(v)}</b>`;
         arrayHost.appendChild(cell);
       });
 
       const root=vals[0];
       const rootOkay=vals.every((v,i)=>i===0 || (min?vals[Math.floor((i-1)/2)]<=v:vals[Math.floor((i-1)/2)]>=v));
-      status.innerHTML=`Root = <b>${esc(root)}</b> · ${rootOkay?`The ${min?'smallest':'largest'} value is at the top. Heap rule is satisfied.`:'The heap rule is being repaired in this step.'}`;
     }
 
     /* The inline heap "Explain aloud" button was intentionally removed.
@@ -17256,8 +17524,10 @@ Node rotateLeft(Node x) {
     surface.style.touchAction='pan-y';
     surface.style.overscrollBehaviorX='auto';
     surface.style.overscrollBehaviorY='auto';
-    content.style.transform='scale(1)';
-    content.style.width='100%';
+    const existingScale=Math.min(MAX,Math.max(MIN,parseFloat(surface.dataset.heapPinchScale||'1')||1));
+    content.style.transform='none';
+    content.style.width=`${Math.max(50,Math.ceil(existingScale*10000)/100)}%`;
+    surface.dataset.heapPinchScale=existingScale.toFixed(3);
 
     function applyVisualScale(scale){
       content.style.transform=`scale(${scale})`;
@@ -17266,16 +17536,22 @@ Node rotateLeft(Node x) {
     function commitScale(surface,content,scale){
       scale=Math.min(MAX,Math.max(MIN,scale));
       surface.dataset.heapPinchScale=scale.toFixed(3);
-      content.style.transform=`scale(${scale})`;
+
+      /* Commit the visual size through layout width only. Do not leave the
+         transform active here, otherwise width scaling + transform scaling
+         would zoom the heap twice. */
+      content.style.transform='none';
+      content.style.width=`${Math.max(50,Math.ceil(scale*10000)/100)}%`;
+
       if(scale<=1.001){
         content.style.width='100%';
         surface.classList.remove('is-heap-zoomed');
         surface.style.overflowX='hidden';
+        surface.style.touchAction='pan-y';
       }else{
-        // Increase the layout width only after the gesture finishes.
-        content.style.width=`${Math.ceil(scale*10000)/100}%`;
         surface.classList.add('is-heap-zoomed');
         surface.style.overflowX='auto';
+        surface.style.touchAction='pan-x pan-y';
       }
     }
 
@@ -17318,11 +17594,11 @@ Node rotateLeft(Node x) {
       if(!st) return;
       states.delete(surface);
       surface.classList.remove('is-pinch-zooming');
-      surface.style.touchAction='pan-y';
       const scale=parseFloat(surface.dataset.heapPinchScale||'1')||1;
       // The live transform is already visible; commit its layout footprint now.
       const visualScale=Math.min(MAX,Math.max(MIN,pendingScale||scale));
       commitScale(surface,content,visualScale);
+      surface.style.touchAction = visualScale > 1.001 ? 'pan-x pan-y' : 'pan-y';
     }
 
     surface.addEventListener('touchend',(e)=>{ if(e.touches.length<2) finish(); },{passive:true});
@@ -17352,7 +17628,13 @@ Node rotateLeft(Node x) {
       if(scale<=1.001){
         content.style.width='100%';
         content.style.transform='scale(1)';
+        surface.classList.remove('is-heap-zoomed');
         surface.style.overflowX='hidden';
+        surface.style.touchAction='pan-y';
+      }else{
+        surface.classList.add('is-heap-zoomed');
+        surface.style.overflowX='auto';
+        surface.style.touchAction='pan-x pan-y';
       }
     });
   },{passive:true});
