@@ -4209,6 +4209,186 @@ html, body{
 }
 </style>
 
+
+<style id="avl-mobile-auto-fit-final">
+/* ===== AVL MOBILE AUTO-FIT ===== */
+@media (max-width:700px){
+  .avl-viz-shell{
+    width:100% !important;
+    max-width:100% !important;
+    min-width:0 !important;
+    gap:9px !important;
+    overflow:visible !important;
+  }
+
+  .avl-step-banner{
+    width:100% !important;
+    padding:9px 10px !important;
+    font-size:11px !important;
+    box-sizing:border-box !important;
+  }
+
+  .avl-op-chip{
+    font-size:8px !important;
+    padding:4px 7px !important;
+  }
+
+  .avl-main-stage{
+    width:100% !important;
+    min-width:0 !important;
+    min-height:0 !important;
+    height:auto !important;
+    padding:7px !important;
+    overflow:hidden !important;
+    box-sizing:border-box !important;
+  }
+
+  .avl-svg{
+    width:100% !important;
+    min-width:0 !important;
+    max-width:100% !important;
+    height:auto !important;
+    display:block !important;
+    margin:0 auto !important;
+  }
+
+  .avl-rotation-compare{
+    width:100% !important;
+    grid-template-columns:1fr !important;
+    gap:7px !important;
+    padding:7px !important;
+    margin-bottom:7px !important;
+    box-sizing:border-box !important;
+  }
+
+  .avl-mini-panel{
+    width:100% !important;
+    min-width:0 !important;
+    overflow:hidden !important;
+    box-sizing:border-box !important;
+  }
+
+  .avl-mini-stage{
+    width:100% !important;
+    min-width:0 !important;
+    min-height:110px !important;
+    height:auto !important;
+    overflow:hidden !important;
+  }
+
+  .avl-mini-stage .avl-svg{
+    width:100% !important;
+    min-width:0 !important;
+    max-width:100% !important;
+    height:auto !important;
+  }
+
+  .avl-rotation-arrow{
+    height:28px !important;
+    transform:rotate(90deg) !important;
+  }
+
+  .avl-rotation-arrow strong{
+    font-size:24px !important;
+  }
+
+  .avl-rotation-arrow span{
+    font-size:7px !important;
+  }
+
+  .avl-metrics{
+    width:100% !important;
+    grid-template-columns:repeat(3,minmax(0,1fr)) !important;
+    gap:5px !important;
+  }
+
+  .avl-metric{
+    padding:7px 5px !important;
+    min-width:0 !important;
+  }
+
+  .avl-metric small{
+    font-size:7px !important;
+  }
+
+  .avl-metric b{
+    font-size:11px !important;
+  }
+
+  /* The unified pinch controller scales #canvasContent. */
+  #canvasContent:has(.avl-viz-shell){
+    width:100% !important;
+    max-width:none !important;
+    min-width:0 !important;
+    transform:none;
+  }
+
+  /* Neutralize the old linked-list nested scale when used on mobile. */
+  #canvasContent:has(.list-viz) .list-viz{
+    --list-gesture-scale:1 !important;
+  }
+
+  #canvasContent.viz-pinch-zoomed,
+  #canvasContent.viz-pinch-active{
+    transform:none !important;
+  }
+}
+
+@media (max-width:420px){
+  .avl-step-banner{
+    font-size:10px !important;
+  }
+
+  .avl-main-stage{
+    padding:5px !important;
+  }
+
+  .avl-value{
+    font-size:13px !important;
+  }
+
+  .avl-meta{
+    font-size:7px !important;
+  }
+
+  .avl-metrics{
+    grid-template-columns:repeat(3,minmax(0,1fr)) !important;
+  }
+}
+</style>
+
+
+<style id="unified-mobile-gesture-final">
+@media (max-width:700px){
+  #canvasContent{
+    transform:none !important;
+    transform-origin:top left !important;
+    will-change:zoom !important;
+  }
+
+  #canvasContent.viz-pinch-zoomed{
+    overflow:visible !important;
+  }
+
+  /* Do not let nested visualizations create their own competing touch model. */
+  #canvasContent .list-viz{
+    touch-action:pan-y !important;
+  }
+
+  /* AVL stages should never force a phone-wide horizontal scrollbar. */
+  #canvasContent .avl-main-stage,
+  #canvasContent .avl-mini-stage{
+    overflow:hidden !important;
+  }
+
+  /* Keep the generic hint clear but unobtrusive. */
+  #vizMobileZoomHint{
+    pointer-events:none !important;
+    font-size:7px !important;
+  }
+}
+</style>
+
 </head>
 
 <body>
@@ -8346,137 +8526,228 @@ const LIST_ALGOS = ['sll','dll','cll'];
 const STACK_ALGOS = ['stack','stack-linked'];
 const QUEUE_ALGOS = ['queue','queue-circular','queue-linked','deque'];
 
-/* ---------------------------- MOBILE VISUALIZATION FIT ---------------------------- */
+/* ---------------------------- UNIFIED MOBILE VISUALIZATION FIT + PINCH ---------------------------- */
 let mobileVizFitRaf = 0;
+let vizGestureScale = 1;
+let lastMobileVizKey = null;
+
+function clampViz(v,min,max){
+  return Math.min(max,Math.max(min,v));
+}
+
+function isHeapVisualizationRoot(root){
+  return !!root?.querySelector?.('.heap-reference-shell');
+}
+
+function currentVizVizKeyChanged(currentKey){
+  return currentKey !== lastMobileVizKey;
+}
+
 function fitMobileVisualization(){
-  const root = document.getElementById('canvasContent');
-  if(!root) return;
+  const root=document.getElementById('canvasContent');
+  if(!root)return;
+
   cancelAnimationFrame(mobileVizFitRaf);
-  mobileVizFitRaf = requestAnimationFrame(()=>{
-    if(!root || !document.body) return;
-    if(window.innerWidth > 700){
-      root.style.zoom = '';
-      root.removeAttribute('data-mobile-zoom');
+  mobileVizFitRaf=requestAnimationFrame(()=>{
+    if(!root || !document.body)return;
+
+    if(window.innerWidth>700){
+      root.style.zoom='';
+      root.style.transform='none';
       root.style.setProperty('--viz-gesture-scale','1');
+      root.removeAttribute('data-mobile-base-zoom');
+      root.classList.remove('viz-pinch-zoomed','viz-pinch-active');
       return;
     }
 
-    /* Measure the base visualization before applying the user's pinch scale.
-       The live explanation is outside #canvasContent, so it is never scaled. */
-    root.style.zoom = '1';
-    const isHeapVisualization = !!root.querySelector('.heap-reference-shell');
-    const isLinkedList = Array.isArray(LIST_ALGOS) && LIST_ALGOS.includes(State.algo);
-    const isTreeVisualization = !!root.querySelector('.tree-stage, .advanced-stage .tree-stage');
-    if(isHeapVisualization){
+    /* When the user switches to another visualization, start that
+       visualization at its own automatic fit rather than inheriting a
+       previous structure's pinch level. */
+    const currentVizKey = String(State?.algo||'');
+    if(lastMobileVizKey !== null && currentVizVizKeyChanged(currentVizKey)){
+      vizGestureScale=1;
+    }
+    lastMobileVizKey=currentVizKey;
+
+    /* Heap has a dedicated zoom surface/controller. */
+    if(isHeapVisualizationRoot(root)){
       root.style.zoom='1';
-      root.dataset.mobileZoom='1';
+      root.style.transform='none';
       root.style.setProperty('--viz-gesture-scale','1');
-      const hint=document.getElementById('vizMobileZoomHint');
-      if(hint) hint.style.display='block';
+      root.dataset.mobileBaseZoom='1';
       return;
     }
-    const activeGestureScale = (isLinkedList || isTreeVisualization) ? 1 : vizGestureScale;
-    root.style.setProperty('--viz-gesture-scale', String(activeGestureScale));
+
+    /* Measure the unscaled visualization. */
+    root.style.zoom='1';
+    root.style.transform='none';
+    root.style.setProperty('--viz-gesture-scale','1');
+
+    const parent=root.parentElement;
+    const available=Math.max(180,(parent?.clientWidth||window.innerWidth)-8);
+    const renderedWidth=Math.max(1,root.scrollWidth);
+
+    /* Automatically shrink wide visualizations to the phone width.
+       Never enlarge them automatically. */
+    const baseZoom=clampViz(available/renderedWidth,.52,1);
+    root.dataset.mobileBaseZoom=baseZoom.toFixed(3);
+
+    const gesture=clampViz(vizGestureScale,.72,2.2);
+    root.style.zoom=String(baseZoom*gesture);
+    root.style.setProperty('--viz-gesture-scale','1');
+
     const hint=document.getElementById('vizMobileZoomHint');
     if(hint){
-      hint.style.display = isLinkedList ? 'none' : 'block';
+      hint.textContent='PINCH WITH TWO FINGERS TO ZOOM';
+      hint.style.display='block';
     }
-    const available = Math.max(1, (root.parentElement?.clientWidth || window.innerWidth) - 4);
-    const renderedWidth = Math.max(1, root.scrollWidth);
-    const desired = available / renderedWidth;
-    const scale = Math.min(1, Math.max(.58, desired));
-    root.style.zoom = String(scale);
-    root.dataset.mobileZoom = scale.toFixed(3);
-    root.style.setProperty('--viz-gesture-scale', String(activeGestureScale));
   });
 }
 
-let vizGestureScale = window.innerWidth <= 700 ? 1.08 : 1;
-(function initMobileVisualizationGesture(){
-  const root = document.getElementById('canvasContent');
-  if(!root) return;
-  let startDistance = 0;
-  let startScale = vizGestureScale;
+(function initUnifiedMobileVisualizationGesture(){
+  const root=document.getElementById('canvasContent');
+  if(!root)return;
+
+  const active=new Map();
+  let pinchStartDistance=0;
+  let pinchStartScale=1;
+  let pendingScale=1;
+  let raf=0;
+
   const distance=(a,b)=>Math.hypot(a.clientX-b.clientX,a.clientY-b.clientY);
-  const isLinkedListTarget=(target)=>!!target?.closest?.('#listViz');
-  const isHeapTarget=()=>!!root.querySelector('.heap-reference-shell');
+  const isHeapTarget=(target)=>!!target?.closest?.('.heap-reference-shell,.heap-ref-zoom-surface');
 
-  const syncScale=()=>{
-    const isHeapVisualization = !!root.querySelector('.heap-reference-shell');
-    const isLinkedList = Array.isArray(LIST_ALGOS) && LIST_ALGOS.includes(State.algo);
-    const isTreeVisualization = !!root.querySelector('.tree-stage, .advanced-stage .tree-stage');
-    if(isHeapVisualization){
-      root.style.zoom='1';
-      root.style.setProperty('--viz-gesture-scale','1');
-      const hint=document.getElementById('vizMobileZoomHint');
-      if(hint){hint.textContent='PINCH WITH TWO FINGERS TO ZOOM';hint.style.display=window.innerWidth<=700?'block':'none';}
-      return;
-    }
-    root.style.setProperty('--viz-gesture-scale', ((isLinkedList || isTreeVisualization) ? 1 : vizGestureScale).toFixed(3));
-    const hint=document.getElementById('vizMobileZoomHint');
-    if(hint){
-      hint.textContent = window.innerWidth <= 700 ? 'PINCH WITH TWO FINGERS TO ZOOM' : '';
-      hint.style.display = (window.innerWidth <= 700 && !isLinkedList) ? 'block' : 'none';
-    }
-    fitMobileVisualization();
-  };
+  function getBaseZoom(){
+    return clampViz(parseFloat(root.dataset.mobileBaseZoom||'1')||1,.52,1);
+  }
 
-  root.addEventListener('touchstart',e=>{
-    if(window.innerWidth>700 || isLinkedListTarget(e.target) || isHeapTarget() || e.touches.length!==2) return;
-    startDistance=distance(e.touches[0],e.touches[1]);
-    startScale=vizGestureScale;
-  },{passive:true});
+  function applyScale(scale){
+    const s=clampViz(scale,.72,2.2);
+    root.style.zoom=String(getBaseZoom()*s);
+    root.style.setProperty('--viz-gesture-scale','1');
+  }
 
-  root.addEventListener('touchmove',e=>{
-    if(window.innerWidth>700 || isLinkedListTarget(e.target) || isHeapTarget() || e.touches.length!==2 || !startDistance) return;
-    e.preventDefault();
-    const ratio=distance(e.touches[0],e.touches[1])/startDistance;
-    vizGestureScale=Math.min(1.8,Math.max(.72,startScale*ratio));
-    root.style.setProperty('--viz-gesture-scale',vizGestureScale.toFixed(3));
-  },{passive:false});
+  function scheduleScale(scale){
+    pendingScale=clampViz(scale,.72,2.2);
+    if(raf)return;
+    raf=requestAnimationFrame(()=>{
+      raf=0;
+      applyScale(pendingScale);
+    });
+  }
 
-  const end=()=>{
-    if(!startDistance) return;
-    startDistance=0;
-    startScale=vizGestureScale;
-    fitMobileVisualization();
-  };
-  root.addEventListener('touchend',end,{passive:true});
-  root.addEventListener('touchcancel',end,{passive:true});
+  function beginPinch(){
+    const pts=[...active.values()];
+    if(pts.length!==2)return;
+    pinchStartDistance=Math.max(1,distance(pts[0],pts[1]));
+    pinchStartScale=clampViz(vizGestureScale,.72,2.2);
+    pendingScale=pinchStartScale;
+    root.classList.add('viz-pinch-active');
+    root.style.userSelect='none';
+  }
+
+  function finishPinch(){
+    if(!pinchStartDistance)return;
+    const finalScale=clampViz(pendingScale,.72,2.2);
+    active.clear();
+    pinchStartDistance=0;
+    vizGestureScale=finalScale;
+    root.classList.remove('viz-pinch-active');
+    root.style.userSelect='';
+    applyScale(vizGestureScale);
+    root.classList.toggle('viz-pinch-zoomed',vizGestureScale>1.001);
+  }
+
+  /* Pointer Events are the primary path on modern Chrome/Android/iOS. */
+  if(window.PointerEvent){
+    root.addEventListener('pointerdown',e=>{
+      if(window.innerWidth>700 || e.pointerType!=='touch' || isHeapTarget(e.target))return;
+      active.set(e.pointerId,{clientX:e.clientX,clientY:e.clientY});
+      try{root.setPointerCapture(e.pointerId);}catch(_e){}
+      if(active.size===2){
+        e.preventDefault();
+        beginPinch();
+      }
+    },{passive:false});
+
+    root.addEventListener('pointermove',e=>{
+      if(window.innerWidth>700 || e.pointerType!=='touch' || isHeapTarget(e.target))return;
+      if(!active.has(e.pointerId))return;
+      active.set(e.pointerId,{clientX:e.clientX,clientY:e.clientY});
+
+      if(active.size===2 && pinchStartDistance){
+        e.preventDefault();
+        const pts=[...active.values()];
+        const ratio=distance(pts[0],pts[1])/pinchStartDistance;
+        scheduleScale(pinchStartScale*ratio);
+      }
+    },{passive:false});
+
+    const finishPointer=e=>{
+      if(e.pointerType!=='touch')return;
+      active.delete(e.pointerId);
+      if(active.size<2 && pinchStartDistance)finishPinch();
+      try{root.releasePointerCapture(e.pointerId);}catch(_e){}
+    };
+
+    root.addEventListener('pointerup',finishPointer,{passive:true});
+    root.addEventListener('pointercancel',finishPointer,{passive:true});
+  }else{
+    /* Legacy fallback only when Pointer Events do not exist, preventing the
+       old pointer+touch double scaling on modern browsers. */
+    root.addEventListener('touchstart',e=>{
+      if(window.innerWidth>700 || isHeapTarget(e.target) || e.touches.length!==2)return;
+      pinchStartDistance=Math.max(1,distance(e.touches[0],e.touches[1]));
+      pinchStartScale=clampViz(vizGestureScale,.72,2.2);
+      pendingScale=pinchStartScale;
+    },{passive:true});
+
+    root.addEventListener('touchmove',e=>{
+      if(window.innerWidth>700 || isHeapTarget(e.target) || e.touches.length!==2 || !pinchStartDistance)return;
+      e.preventDefault();
+      const ratio=distance(e.touches[0],e.touches[1])/pinchStartDistance;
+      const next=clampViz(pinchStartScale*ratio,.72,2.2);
+      pendingScale=next;
+      scheduleScale(next);
+    },{passive:false});
+
+    root.addEventListener('touchend',e=>{
+      if(!pinchStartDistance || e.touches.length>=2)return;
+      vizGestureScale=clampViz(pendingScale,.72,2.2);
+      pinchStartDistance=0;
+      applyScale(vizGestureScale);
+      root.classList.toggle('viz-pinch-zoomed',vizGestureScale>1.001);
+    },{passive:true});
+  }
 
   window.addEventListener('resize',()=>{
     if(window.innerWidth>700){
       vizGestureScale=1;
-      root.style.setProperty('--viz-gesture-scale','1');
+      root.style.zoom='';
+      root.style.transform='none';
+      root.classList.remove('viz-pinch-active','viz-pinch-zoomed');
       return;
     }
-    if(!vizGestureScale || vizGestureScale===1) vizGestureScale=1.08;
-    const isLinkedList=Array.isArray(LIST_ALGOS) && LIST_ALGOS.includes(State.algo);
-    const isTreeVisualization=!!root.querySelector('.tree-stage, .advanced-stage .tree-stage');
-    const isHeapVisualization=!!root.querySelector('.heap-reference-shell');
-    root.style.setProperty('--viz-gesture-scale',((isLinkedList || isTreeVisualization || isHeapVisualization) ? 1 : vizGestureScale).toFixed(3));
+    fitMobileVisualization();
   },{passive:true});
 
-  syncScale();
-  setTimeout(()=>{
-    const hint=document.getElementById('vizMobileZoomHint');
-    if(hint && window.innerWidth<=700) hint.style.opacity='0';
-  },3600);
-})();
+  window.addEventListener('orientationchange',()=>{
+    setTimeout(fitMobileVisualization,120);
+  },{passive:true});
 
-(function initMobileVisualizationFit(){
-  const root = document.getElementById('canvasContent');
-  if(!root) return;
-  const observer = new MutationObserver(()=>{ if(!root.querySelector('.heap-reference-shell')) fitMobileVisualization(); });
-  observer.observe(root, {childList:true, subtree:true});
-  if(typeof ResizeObserver === 'function'){
-    const ro = new ResizeObserver(()=>fitMobileVisualization());
-    if(root.parentElement) ro.observe(root.parentElement);
+  const mo=new MutationObserver(()=>{
+    if(!isHeapVisualizationRoot(root))fitMobileVisualization();
+  });
+  mo.observe(root,{childList:true,subtree:true});
+
+  if(typeof ResizeObserver==='function'){
+    const ro=new ResizeObserver(()=>fitMobileVisualization());
+    if(root.parentElement)ro.observe(root.parentElement);
   }
-  window.addEventListener('resize', fitMobileVisualization, {passive:true});
-  window.addEventListener('orientationchange', ()=>setTimeout(fitMobileVisualization, 80), {passive:true});
+
   fitMobileVisualization();
 })();
+
 
 function renderCanvasBase(){
   cleanupTreeDisplayDetails();
@@ -9352,24 +9623,10 @@ function renderLinkedListCanvas(){
 }
 let linkedListZoom=1;
 function setupLinkedListPinch(wrap){
-  if(!wrap) return;
-  let startDistance=0;
-  let startZoom=linkedListZoom;
-  const distance=(a,b)=>Math.hypot(a.clientX-b.clientX,a.clientY-b.clientY);
-  wrap.addEventListener('touchstart',e=>{
-    if(e.touches.length!==2) return;
-    startDistance=distance(e.touches[0],e.touches[1]);
-    startZoom=linkedListZoom;
-  },{passive:true});
-  wrap.addEventListener('touchmove',e=>{
-    if(e.touches.length!==2 || !startDistance) return;
-    e.preventDefault();
-    linkedListZoom=Math.min(2.2,Math.max(.8,startZoom*(distance(e.touches[0],e.touches[1])/startDistance)));
-    wrap.style.setProperty('--list-gesture-scale',linkedListZoom.toFixed(2));
-  },{passive:false});
-  const end=()=>{startDistance=0;startZoom=linkedListZoom;};
-  wrap.addEventListener('touchend',end,{passive:true});
-  wrap.addEventListener('touchcancel',end,{passive:true});
+  /* The shared visualization gesture controller owns pinch zoom now.
+     Keep this function as a compatibility no-op because renderLinkedListCanvas()
+     still calls it. */
+  if(wrap) wrap.style.setProperty('--list-gesture-scale','1');
 }
 function setListState(i,state){ const el=document.querySelector(`#listViz .list-node[data-index="${i}"]`); if(el) el.dataset.state=state; }
 function renderLinkedListStep(){
@@ -17697,3 +17954,164 @@ Node rotateLeft(Node x) {
 </html>
 
 <style id="tree-theory-strip-compact-guard">.tree-theory-strip{display:none !important;}</style>
+
+<style id="mobile-viz-final-hard-fix">
+/* ================================================================
+   FINAL MOBILE VISUALIZATION RULES
+   Only visualization sizing/gesture behavior is affected.
+================================================================ */
+@media (max-width:700px){
+  #canvasContent{
+    width:100% !important;
+    max-width:none !important;
+    min-width:0 !important;
+    transform:none !important;
+    transform-origin:top left !important;
+  }
+
+  /* The unified controller owns pinch for all regular visualizations. */
+  #canvasContent .list-viz{
+    --list-gesture-scale:1 !important;
+    min-width:0 !important;
+    max-width:none !important;
+  }
+
+  /* AVL: remove every fixed-width constraint introduced by earlier styles. */
+  #canvasContent .avl-viz-shell{
+    width:100% !important;
+    max-width:100% !important;
+    min-width:0 !important;
+    margin:0 !important;
+    overflow:visible !important;
+  }
+
+  #canvasContent .avl-step-banner{
+    width:100% !important;
+    max-width:100% !important;
+    box-sizing:border-box !important;
+    padding:8px 9px !important;
+    gap:7px !important;
+    font-size:10.5px !important;
+  }
+
+  #canvasContent .avl-main-stage{
+    width:100% !important;
+    max-width:100% !important;
+    min-width:0 !important;
+    min-height:0 !important;
+    height:auto !important;
+    box-sizing:border-box !important;
+    padding:5px !important;
+    overflow:hidden !important;
+  }
+
+  #canvasContent .avl-svg{
+    display:block !important;
+    width:100% !important;
+    max-width:100% !important;
+    min-width:0 !important;
+    height:auto !important;
+    margin:0 auto !important;
+  }
+
+  #canvasContent .avl-rotation-compare{
+    width:100% !important;
+    max-width:100% !important;
+    min-width:0 !important;
+    box-sizing:border-box !important;
+    grid-template-columns:1fr !important;
+    gap:6px !important;
+    padding:6px !important;
+    overflow:hidden !important;
+  }
+
+  #canvasContent .avl-mini-panel{
+    width:100% !important;
+    max-width:100% !important;
+    min-width:0 !important;
+    overflow:hidden !important;
+    box-sizing:border-box !important;
+  }
+
+  #canvasContent .avl-mini-stage{
+    width:100% !important;
+    max-width:100% !important;
+    min-width:0 !important;
+    min-height:0 !important;
+    height:auto !important;
+    overflow:hidden !important;
+    box-sizing:border-box !important;
+  }
+
+  #canvasContent .avl-mini-stage .avl-svg{
+    display:block !important;
+    width:100% !important;
+    max-width:100% !important;
+    min-width:0 !important;
+    height:auto !important;
+  }
+
+  #canvasContent .avl-rotation-arrow{
+    height:24px !important;
+    transform:rotate(90deg) !important;
+  }
+
+  #canvasContent .avl-rotation-arrow strong{
+    font-size:22px !important;
+  }
+
+  #canvasContent .avl-rotation-arrow span{
+    font-size:7px !important;
+  }
+
+  #canvasContent .avl-metrics{
+    width:100% !important;
+    max-width:100% !important;
+    grid-template-columns:repeat(3,minmax(0,1fr)) !important;
+    gap:4px !important;
+  }
+
+  #canvasContent .avl-metric{
+    min-width:0 !important;
+    padding:6px 4px !important;
+  }
+
+  /* A zoomed visualization has a real layout footprint, so it can be panned
+     naturally instead of being clipped by a fixed stage. */
+  #canvasArea:has(#canvasContent.viz-pinch-zoomed){
+    overflow:auto !important;
+    -webkit-overflow-scrolling:touch;
+    overscroll-behavior:contain;
+  }
+}
+
+@media (min-width:701px){
+  /* Keep desktop unaffected by mobile fitting rules. */
+  #canvasContent .avl-svg{
+    max-width:920px;
+  }
+}
+</style>
+
+<style id="mobile-pinch-touch-action-final">
+@media (max-width:700px){
+  #canvasContent{
+    touch-action:pan-x pan-y !important;
+    -webkit-touch-callout:none;
+  }
+
+  #canvasContent.viz-pinch-active{
+    touch-action:none !important;
+    user-select:none !important;
+  }
+
+  /* A zoomed visualization becomes a genuine layout surface so it can be
+     panned after the pinch without clipping. */
+  #canvasArea:has(#canvasContent.viz-pinch-zoomed){
+    overflow:auto !important;
+    -webkit-overflow-scrolling:touch;
+    overscroll-behavior:contain;
+  }
+}
+</style>
+
