@@ -4389,6 +4389,209 @@ html, body{
 }
 </style>
 
+
+<style id="heap-sort-only-ui">
+/* ===== HEAP SORT ONLY ===== */
+.heap-sort-shell .heap-sort-head{margin-bottom:28px}
+.heap-sort-array{display:flex;flex-wrap:wrap;gap:8px;align-items:stretch}
+.heap-sort-cell{position:relative;min-width:66px}
+.heap-sort-cell.heap-sort-sorted{border-color:var(--op-sorted);background:rgba(52,211,153,.08)}
+.heap-sort-cell.heap-sort-sorted b{color:var(--op-sorted)}
+.heap-sort-cell.heap-sort-sorted span{color:var(--op-sorted)}
+.heap-sort-cell span{display:block;font:700 8px var(--font-mono);color:var(--text-2);letter-spacing:.06em;margin-top:2px}
+.heap-sort-status{display:flex;justify-content:center;align-items:center;gap:10px;flex-wrap:wrap;margin-top:14px;padding:10px 12px;border:1px solid var(--border);border-radius:11px;background:var(--panel);font-size:10px;color:var(--text-2)}
+.heap-sort-status b{font:800 10px var(--font-mono);color:var(--text-0)}
+.heap-sort-learn{grid-template-columns:auto minmax(0,1fr)}
+.ws-heapsort-array-input{flex:1;min-width:250px;max-width:420px}
+.ws-heapsort-array-input input{width:100%;min-width:0}
+@media(max-width:700px){
+  .heap-sort-shell .heap-sort-head{margin-bottom:18px}
+  .heap-sort-array{gap:7px}
+  .heap-sort-cell{min-width:0;width:calc(25% - 6px)}
+  .ws-heapsort-array-input{width:100%;max-width:none;min-width:100%;order:0}
+  .heap-sort-status{font-size:9.5px}
+  .heap-sort-learn{grid-template-columns:1fr;}
+}
+@media(max-width:420px){
+  .heap-sort-cell{width:calc(50% - 4px)}
+  .heap-sort-cell b{font-size:15px}
+}
+</style>
+
+<style id="heap-sort-reference-final-v2">
+/* ================================================================
+   HEAP SORT ONLY — ARRAY ↔ BINARY TREE REFERENCE VIEW
+   These selectors are intentionally scoped to .heap-sort-shell so the
+   existing Min Heap / Max Heap / Heapify visualizations are untouched.
+================================================================ */
+.heap-sort-shell{
+  width:min(1040px,100%) !important;
+  max-width:1040px !important;
+  margin:0 auto !important;
+  padding:0 0 22px !important;
+  gap:0 !important;
+  color:var(--text-0);
+}
+.heap-sort-title-card{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:28px;
+  border:1px solid rgba(88,80,151,.45);
+  background:linear-gradient(180deg,rgba(18,19,28,.96),rgba(14,16,23,.96));
+  border-radius:18px;
+  padding:20px 20px 19px;
+  margin:0 0 14px;
+  box-shadow:0 18px 44px -30px rgba(0,0,0,.55);
+}
+.heap-sort-title-copy{min-width:0}
+.heap-sort-title-copy h2{
+  font-size:26px;
+  line-height:1.08;
+  margin:0 0 9px;
+  font-weight:800;
+  letter-spacing:-.02em;
+}
+.heap-sort-title-copy p{
+  max-width:720px;
+  color:var(--text-1);
+  font-size:13px;
+  line-height:1.6;
+}
+.heap-sort-title-copy p b{color:var(--text-0)}
+.heap-sort-rule{
+  flex:0 0 auto;
+  min-width:190px;
+  padding-left:18px;
+  border-left:1px solid rgba(112,102,172,.35);
+}
+.heap-sort-rule small{
+  display:block;
+  color:#8490b0;
+  font:700 10px var(--font-mono);
+  letter-spacing:.06em;
+  margin-bottom:6px;
+}
+.heap-sort-rule code{color:#e04cff;font:800 15px var(--font-mono)}
+.heap-sort-panel{
+  border:1px solid var(--border);
+  background:rgba(11,14,21,.60);
+  border-radius:17px;
+  padding:12px 15px 15px;
+  margin:0 0 14px;
+}
+.heap-sort-section-head{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:14px;
+  padding:0 2px 10px;
+}
+.heap-sort-section-head b{font-size:13px;font-family:var(--font-display)}
+.heap-sort-section-head span{color:var(--text-2);font:600 10px var(--font-mono);white-space:nowrap}
+.heap-sort-tree-box{
+  position:relative;
+  width:100%;
+  min-height:300px;
+  border:1px solid var(--border-soft);
+  background:#0a0d14;
+  border-radius:14px;
+  overflow:hidden;
+}
+.heap-sort-tree-box svg{
+  display:block !important;
+  width:100% !important;
+  max-width:100% !important;
+  height:auto !important;
+  min-width:0 !important;
+  min-height:0 !important;
+  aspect-ratio:auto !important;
+}
+.heap-sort-edge{stroke:#262d3d;stroke-width:2.4;transition:.18s}
+.heap-sort-edge.active{stroke:var(--accent);stroke-width:3.1;filter:drop-shadow(0 0 5px rgba(255,106,61,.20))}
+.heap-sort-node{fill:#0f131c;stroke:#2b3241;stroke-width:2.2;transition:.18s}
+.heap-sort-node.root{stroke:#d946ef;stroke-width:3.4;filter:drop-shadow(0 0 8px rgba(217,70,239,.28))}
+.heap-sort-node.selected{fill:rgba(255,106,61,.13);stroke:var(--accent);stroke-width:3.2;filter:drop-shadow(0 0 8px rgba(255,106,61,.18))}
+.heap-sort-node.root.selected{fill:rgba(217,70,239,.12);stroke:#d946ef;filter:drop-shadow(0 0 10px rgba(217,70,239,.32))}
+.heap-sort-value{fill:#edf0f7;font:800 20px var(--font-mono);pointer-events:none}
+.heap-sort-position{fill:#727d94;font:600 9px var(--font-mono);pointer-events:none}
+.heap-sort-empty{height:300px;display:grid;place-items:center;color:var(--text-2);font:700 11px var(--font-mono)}
+.heap-sort-array-panel{padding-bottom:13px}
+.heap-sort-array{
+  display:grid !important;
+  grid-template-columns:repeat(9,minmax(0,1fr));
+  gap:7px;
+  width:100% !important;
+  max-width:none !important;
+  margin:0 !important;
+  align-items:stretch;
+}
+.heap-sort-array-cell{
+  min-width:0;
+  min-height:70px;
+  border:1px solid #29334a;
+  border-radius:11px;
+  background:linear-gradient(180deg,#0d1320,#0c111b);
+  display:grid;
+  grid-template-rows:auto 1fr auto;
+  place-items:center;
+  gap:3px;
+  padding:8px 5px 7px;
+  text-align:center;
+  transition:.18s;
+}
+.heap-sort-array-cell small{color:#6e7890;font:700 8px var(--font-mono);white-space:nowrap}
+.heap-sort-array-cell b{font:800 19px var(--font-mono);line-height:1;color:#eff2f8}
+.heap-sort-array-cell span{color:#6e7890;font:700 8px var(--font-mono);letter-spacing:.08em}
+.heap-sort-array-cell.selected{border-color:var(--accent);background:rgba(255,106,61,.085);box-shadow:0 0 0 1px rgba(255,106,61,.08),0 12px 22px -18px rgba(255,106,61,.45)}
+.heap-sort-array-cell.sorted{border-color:rgba(52,211,153,.35);background:rgba(52,211,153,.08)}
+.heap-sort-array-cell.sorted b{color:#dffced}
+.heap-sort-array-cell.sorted span{color:var(--op-sorted)}
+
+[data-theme="light"] .heap-sort-title-card{
+  background:linear-gradient(180deg,rgba(255,255,255,.78),rgba(248,249,252,.96));
+}
+[data-theme="light"] .heap-sort-panel{background:rgba(255,255,255,.58)}
+[data-theme="light"] .heap-sort-tree-box{background:#f4f6fb}
+[data-theme="light"] .heap-sort-node{fill:#fff;stroke:#aeb6c8}
+[data-theme="light"] .heap-sort-value{fill:#161826}
+[data-theme="light"] .heap-sort-position{fill:#697287}
+[data-theme="light"] .heap-sort-array-cell{background:linear-gradient(180deg,#fbfcff,#eef1f7);border-color:#cbd1df}
+[data-theme="light"] .heap-sort-array-cell b{color:#161826}
+
+@media (max-width:900px){
+  .heap-sort-title-copy h2{font-size:22px}
+  .heap-sort-title-card{gap:18px}
+  .heap-sort-rule{min-width:165px}
+  .heap-sort-array{grid-template-columns:repeat(5,minmax(0,1fr)) !important}
+}
+@media (max-width:700px){
+  .heap-sort-shell{padding:0 0 12px !important}
+  .heap-sort-title-card{flex-direction:column;gap:14px;padding:16px 15px}
+  .heap-sort-title-copy h2{font-size:20px}
+  .heap-sort-title-copy p{font-size:11px;line-height:1.55}
+  .heap-sort-rule{width:100%;min-width:0;padding:10px 0 0;border-left:0;border-top:1px solid rgba(112,102,172,.35)}
+  .heap-sort-rule code{font-size:13px}
+  .heap-sort-panel{padding:10px 10px 11px;border-radius:15px}
+  .heap-sort-section-head b{font-size:12px}
+  .heap-sort-section-head span{font-size:8.5px}
+  .heap-sort-tree-box{min-height:250px;border-radius:12px}
+  .heap-sort-value{font-size:17px}
+  .heap-sort-position{font-size:7px}
+  .heap-sort-array{grid-template-columns:repeat(4,minmax(0,1fr)) !important;gap:6px}
+  .heap-sort-array-cell{min-height:63px;padding:7px 3px 6px}
+  .heap-sort-array-cell small{font-size:7px}
+  .heap-sort-array-cell b{font-size:16px}
+  .heap-sort-array-cell span{font-size:7px}
+}
+@media (max-width:420px){
+  .heap-sort-title-copy h2{font-size:18px}
+  .heap-sort-title-copy p{font-size:10.5px}
+  .heap-sort-array{grid-template-columns:repeat(3,minmax(0,1fr)) !important}
+  .heap-sort-array-cell b{font-size:15px}
+}
+</style>
+
 </head>
 
 <body>
@@ -4628,12 +4831,6 @@ html, body{
           <button class="side-item" data-open="merge"><span class="side-icon">•</span><span class="side-label">Merge Sort</span></button>
           <button class="side-item" data-open="quick"><span class="side-icon">•</span><span class="side-label">Quick Sort</span></button>
           <button class="side-item" data-open="heapsort"><span class="side-icon">•</span><span class="side-label">Heap Sort</span></button>
-          <button class="side-item" data-topic="Comparisons"><span class="side-icon">•</span><span class="side-label">Comparisons</span></button>
-          <button class="side-item" data-topic="Swaps"><span class="side-icon">•</span><span class="side-label">Swaps</span></button>
-          <button class="side-item" data-topic="Pivot"><span class="side-icon">•</span><span class="side-label">Pivot</span></button>
-          <button class="side-item" data-topic="Partitions"><span class="side-icon">•</span><span class="side-label">Partitions</span></button>
-          <button class="side-item" data-topic="Merge Process"><span class="side-icon">•</span><span class="side-label">Merge Process</span></button>
-          <button class="side-item" data-topic="Sorted Regions"><span class="side-icon">•</span><span class="side-label">Sorted Regions</span></button>
         </div>
       </div>
 
@@ -11805,13 +12002,73 @@ document.addEventListener('keydown', (e)=>{
     s.push(sleeplessStep({values:a,target},'NOT FOUND',`${target} is not present in the array.`,`The candidate block ended without a match.`,{kind:'array',result:[]})); return {steps:s,values:a,target};
   }
 
-  function genHeapSort(arr){let a=[...arr],s=[];const heap=[];const swap=(i,j)=>{[a[i],a[j]]=[a[j],a[i]];};
-    s.push(sleeplessStep({values:a,phase:'build'},'READY','Build a max heap before sorting.','Heap Sort uses the maximum element as the next item placed at the end.',{kind:'array'}));
-    function down(i,n){while(true){let l=2*i+1,r=l+1,m=i;if(l<n&&a[l]>a[m])m=l;if(r<n&&a[r]>a[m])m=r;if(m===i)break;swap(i,m);s.push(sleeplessStep({values:a,boundary:n},'SIFT DOWN',`Swap ${a[m]} with its parent during heap repair.`,`The max-heap property must be restored.`,{kind:'array',idx:[i,m]}));i=m;}}
-    for(let i=Math.floor(a.length/2)-1;i>=0;i--)down(i,a.length);
-    s.push(sleeplessStep({values:a,boundary:a.length,phase:'heap'},'HEAP BUILT','The max heap is built.','The root now contains the largest remaining value.',{kind:'array'}));
-    for(let end=a.length-1;end>0;end--){swap(0,end);s.push(sleeplessStep({values:a,boundary:end},'PLACE',`Move maximum ${a[end]} to final index ${end}.`,`The largest unsorted value belongs at the end of the remaining range.`,{kind:'array',idx:[0,end]}));down(0,end);}
-    s.push(sleeplessStep({values:a,boundary:0,done:true},'DONE',`Heap Sort complete: ${a.join(' → ')}.`,`Every heap root was placed into its final position.`,{kind:'array',result:a})); return {steps:s,values:a};
+  function genHeapSort(arr){
+    const a=Array.isArray(arr)?arr.slice():[];
+    const steps=[];
+    const n=a.length;
+    const swap=(i,j)=>{[a[i],a[j]]=[a[j],a[i]];};
+    const snap=(phase,heapSize,idx=[])=>({
+      values:a.slice(),heapSize,phase,sortMode:true,sortedFrom:Math.max(0,heapSize),
+      selected:idx.slice()
+    });
+    const push=(op,explain,why,phase,heapSize,idx=[],result=[])=>{
+      steps.push(sleeplessStep(snap(phase,heapSize,idx),op,explain,why,{kind:'heap-sort',idx:idx.slice(),result}));
+    };
+
+    if(n===0){
+      push('START','The array is empty. There is nothing to sort.','Heap Sort immediately finishes for an empty array.','empty',0);
+      push('DONE','Heap Sort complete: the array is empty.','No heap operations were needed.','done',0,[],[]);
+      return {steps,values:a};
+    }
+
+    push('START',`Start with the array: [${a.join(', ')}].`,'Heap Sort first treats the array as a complete binary tree.','start',n);
+    push('BUILD HEAP','Build a max heap from the array.','The largest value must reach the root before we can place values at the end.','build',n);
+
+    function siftDown(start,size){
+      let i=start;
+      while(true){
+        const left=2*i+1;
+        const right=2*i+2;
+        if(left>=size)break;
+
+        const children=right<size?[left,right]:[left];
+        push('COMPARE',`At index ${i}, compare parent ${a[i]} with its child value${children.length===2?'s':''}: ${children.map(x=>a[x]).join(' and ')}.`,`The larger child is the one that should move upward in a max heap.`,'compare',size,[i,...children]);
+
+        let largest=left;
+        if(right<size && a[right]>a[left])largest=right;
+        if(a[largest]===undefined || a[i]>=a[largest]){
+          push('SETTLED',`${a[i]} is already larger than its children, so this subtree is correct.`,`No swap is needed because the max-heap rule is satisfied at this node.`,'heapify',size,[i,...children]);
+          break;
+        }
+
+        const parentValue=a[i],childValue=a[largest];
+        swap(i,largest);
+        push('SIFT DOWN',`Swap ${parentValue} and ${childValue}.`,`The larger child moves up. We continue downward because the value moved into the child position may still be too small.`,'heapify',size,[i,largest]);
+        i=largest;
+      }
+    }
+
+    // Bottom-up heap construction: leaves are already valid heaps.
+    for(let i=Math.floor(n/2)-1;i>=0;i--){
+      push('HEAPIFY',`Heapify the subtree whose root is index ${i} (value ${a[i]}).`,`Every leaf is already a valid heap, so we only need to repair internal nodes from right to left.`,'build',n,[i]);
+      siftDown(i,n);
+    }
+    push('HEAP BUILT',`Max heap built: [${a.join(', ')}].`,'The largest value is now at the root of the binary tree.','heap-ready',n,[0]);
+
+    // Repeatedly move the root to the sorted suffix.
+    for(let end=n-1;end>0;end--){
+      push('EXTRACT MAX',`The root ${a[0]} is the largest value in the remaining heap.`,`That maximum can now be moved to index ${end}, where it will stay permanently.`,'extract',end+1,[0,end]);
+      const maxValue=a[0];
+      swap(0,end);
+      push('PLACE MAX',`Move maximum ${maxValue} to index ${end}.`,`The sorted part grows by one element. The heap now uses only indices 0 to ${end-1}.`,'place',end,[0,end]);
+      if(end>1){
+        push('REPAIR HEAP',`The new root is ${a[0]}. Repair the remaining heap.`,'After moving the maximum out, the new root may violate the max-heap rule.','repair',end,[0]);
+        siftDown(0,end);
+      }
+    }
+
+    push('DONE',`Heap Sort complete: [${a.join(', ')}].`,'Every maximum was placed at the end of the remaining range, so the complete array is sorted.','done',0,[],a.slice());
+    return {steps,values:a};
   }
 
   function hashTable(){return Array.from({length:10},()=>null);}
@@ -11884,7 +12141,7 @@ document.addEventListener('keydown', (e)=>{
 
   function simpleAdvanced(key){
     if(key==='jump-search')return normalizeResult(genJump(randArray(12,10,90)));
-    if(key==='heapsort')return normalizeResult(genHeapSort(randArray(10,5,95)));
+    if(key==='heapsort')return normalizeResult(genHeapSort(advancedInputState[key]?.values!==undefined?numsFromInput(key):heapWorkingValues.slice()));
     if(key.startsWith('hash'))return normalizeResult(genHash(key));
     if(key==='heap'||key.startsWith('heap-')||['heapify','extract-min','extract-max'].includes(key))return normalizeResult(heapSteps(key));
     if(key==='trie')return normalizeResult(trieSteps(key));
@@ -11969,13 +12226,43 @@ document.addEventListener('keydown', (e)=>{
   function isAdvanced(key){return ADVANCED_KEYS.has(key);}
   function advancedInfo(key){return ADV_INFO[key]||ADV_INFO.graph;}
   function refreshAdvanced(){advancedResult=simpleAdvanced(advancedKey);State.steps=advancedResult.steps||[];State.stepIdx=-1;renderAdvancedCanvas();renderAdvancedStep();renderAdvancedControls();}
-  function selectAdvanced(key){pausePlayback();resetFilter();document.querySelector('#view-workspace .workspace')?.classList.remove('race-mode');advancedKey=key;State.algo=key;State.target=null;State.sideTab='explain';advancedAction='demo';document.querySelector('#view-workspace .workspace')?.classList.remove('fundamental-mode');const info=advancedInfo(key);document.getElementById('wsTitle').textContent=info.title||key;document.getElementById('wsControlsRow').style.display='flex';document.querySelectorAll('.ws-tabs button').forEach((b,i)=>b.classList.toggle('active',i===0));document.getElementById('legendBar').innerHTML=`<span class="legend-caption">${esc(info.kicker||'DSA')}</span><span class="legend-hint">Play or step through the interactive demonstration.</span>`;refreshAdvanced();}
+  function selectAdvanced(key){pausePlayback();resetFilter();document.querySelector('#view-workspace .workspace')?.classList.remove('race-mode');advancedKey=key;State.algo=key;State.target=null;State.sideTab='explain';advancedAction='demo';if(key==='heapsort' && advancedInputState.heapsort?.values===undefined)heapWorkingValues=HEAP_SORT_SAMPLE.slice();document.querySelector('#view-workspace .workspace')?.classList.remove('fundamental-mode');const info=advancedInfo(key);document.getElementById('wsTitle').textContent=info.title||key;document.getElementById('wsControlsRow').style.display='flex';document.querySelectorAll('.ws-tabs button').forEach((b,i)=>b.classList.toggle('active',i===0));document.getElementById('legendBar').innerHTML=`<span class="legend-caption">${esc(info.kicker||'DSA')}</span><span class="legend-hint">Play or step through the interactive demonstration.</span>`;refreshAdvanced();}
 
   function renderAdvancedControls(){
     const el=document.getElementById('wsControlsRow');
     if(!el)return;
     el.style.display='flex';
     const hash=advancedKey.startsWith('hash'), heap=heapTopicKey(advancedKey), graphKey=['bfs','dfs','dijkstra','astar','prim','kruskal','topological-sort','strongly-connected-components','bellman-ford','floyd-warshall'].includes(advancedKey);
+    if(advancedKey==='heapsort'){
+      const saved=advancedInputState[advancedKey]?.values!==undefined?advancedInputState[advancedKey].values:heapWorkingValues.join(', ');
+      el.innerHTML=`
+        <div class="ws-size-group ws-heapsort-array-input"><label>ARRAY</label><input type="text" id="advHeapSortValues" value="${esc(saved)}" placeholder="9, 4, 7, 3, 8, 2, 6" aria-label="Heap Sort array values"></div>
+        <button class="wbtn apply" id="advRun" type="button">▶ Apply & Sort</button>
+        <button class="wbtn randomize" id="advRandom" type="button">🎲 Randomize</button>
+        <button class="wbtn clear" id="advReset" type="button">↺ Reset sample</button>`;
+      document.getElementById('advRun')?.addEventListener('click',()=>{
+        const raw=String(document.getElementById('advHeapSortValues')?.value||'').trim();
+        const values=raw===''?[]:raw.split(',').map(x=>Number(x.trim())).filter(Number.isFinite).slice(0,15);
+        if(raw!=='' && !values.length){toast('Enter comma-separated numbers.', 'error');return;}
+        advancedInputState.heapsort={values:values.join(', ')};
+        heapWorkingValues=values.slice();
+        refreshAdvanced();
+      });
+      document.getElementById('advRandom')?.addEventListener('click',()=>{
+        heapWorkingValues=randomHeapValues();
+        advancedInputState.heapsort={values:heapWorkingValues.join(', ')};
+        refreshAdvanced();
+        toast('New Heap Sort array created.');
+      });
+      document.getElementById('advReset')?.addEventListener('click',()=>{
+        heapWorkingValues=HEAP_SORT_SAMPLE.slice();
+        advancedInputState.heapsort={values:HEAP_SORT_SAMPLE.join(', ')};
+        refreshAdvanced();
+        toast('Heap Sort sample restored.');
+      });
+      document.getElementById('advHeapSortValues')?.addEventListener('keydown',e=>{if(e.key==='Enter')document.getElementById('advRun')?.click();});
+      return;
+    }
     if(heap){
       const type=heapTypeForKey(advancedKey);
       const action=heapActionForKey(advancedKey);
@@ -12047,7 +12334,7 @@ document.addEventListener('keydown', (e)=>{
   }
 
   function renderAdvancedCanvas(){const el=document.getElementById('canvasContent');el.innerHTML='';const st=State.stepIdx>=0?State.steps[State.stepIdx]:State.steps[0];const wrap=document.createElement('div');wrap.className='advanced-viz-shell';const info=advancedInfo(advancedKey);wrap.innerHTML=`<div class="advanced-viz-meta"><span class="tree-badge">${esc(info.kicker||'DSA')}</span><span class="tree-badge neutral">${State.steps.length} steps</span></div><div class="advanced-stage" id="advancedStage"></div><div class="advanced-trace" id="advancedTrace" hidden></div>`;el.appendChild(wrap);renderAdvancedStage(st);}
-  function renderAdvancedStage(st){const stage=document.getElementById('advancedStage');if(!stage)return;stage.innerHTML='';const snap=st?.snapshot||{};const kind=st?.kind||'text';if(kind==='array'){const vals=Array.isArray(snap)?snap:(Array.isArray(snap.values)?snap.values:[]);const row=document.createElement('div');row.className='adv-bars';vals.forEach((v,i)=>{const c=document.createElement('div');c.className='adv-bar-cell';const bar=document.createElement('div');bar.className='adv-bar';bar.style.height=(25+Math.min(75,Math.abs(Number(v))*0.75))+'%';if(st.idx?.includes(i)||snap.found===i)bar.classList.add('active');bar.textContent=v;c.appendChild(bar);const l=document.createElement('small');l.textContent=i;c.appendChild(l);row.appendChild(c);});stage.appendChild(row);return;}if(kind==='hash'){renderHash(stage,snap,st);return;}if(kind==='hash-chain'){renderHashChain(stage,snap,st);return;}if(kind==='heap'){renderAdvancedHeap(stage,snap,st);return;}if(kind==='tree'){drawAdvancedTree(stage,snap);return;}if(kind==='trie'){renderTrie(stage,snap);return;}if(kind==='graph'){renderGraph(stage,snap,st);return;}if(kind==='matrix'){renderMatrix(stage,snap.matrix);return;}if(kind==='dsu'){renderDSU(stage,snap);return;}if(kind==='segment'){renderSegment(stage,snap);return;}if(kind==='fenwick'){renderFenwick(stage,snap);return;}if(kind==='grid'||kind==='sudoku'||kind==='maze'){renderGrid(stage,snap,kind,st);return;}if(kind==='bits'){renderBits(stage,snap);return;}if(kind==='string'){renderString(stage,snap,st);return;}const card=document.createElement('div');card.className='advanced-text-card';card.innerHTML=`<div class="advanced-kicker">${esc(infoLabel(advancedKey))}</div><h3>${esc(snap.title||infoLabel(advancedKey))}</h3><p>${esc(st?.explain||advancedInfo(advancedKey).def)}</p>`;stage.appendChild(card);}
+  function renderAdvancedStage(st){const stage=document.getElementById('advancedStage');if(!stage)return;stage.innerHTML='';const snap=st?.snapshot||{};const kind=st?.kind||'text';if(kind==='heap-sort'){renderHeapSortStage(stage,snap,st);return;}if(kind==='array'){const vals=Array.isArray(snap)?snap:(Array.isArray(snap.values)?snap.values:[]);const row=document.createElement('div');row.className='adv-bars';vals.forEach((v,i)=>{const c=document.createElement('div');c.className='adv-bar-cell';const bar=document.createElement('div');bar.className='adv-bar';bar.style.height=(25+Math.min(75,Math.abs(Number(v))*0.75))+'%';if(st.idx?.includes(i)||snap.found===i)bar.classList.add('active');bar.textContent=v;c.appendChild(bar);const l=document.createElement('small');l.textContent=i;c.appendChild(l);row.appendChild(c);});stage.appendChild(row);return;}if(kind==='hash'){renderHash(stage,snap,st);return;}if(kind==='hash-chain'){renderHashChain(stage,snap,st);return;}if(kind==='heap'){renderAdvancedHeap(stage,snap,st);return;}if(kind==='tree'){drawAdvancedTree(stage,snap);return;}if(kind==='trie'){renderTrie(stage,snap);return;}if(kind==='graph'){renderGraph(stage,snap,st);return;}if(kind==='matrix'){renderMatrix(stage,snap.matrix);return;}if(kind==='dsu'){renderDSU(stage,snap);return;}if(kind==='segment'){renderSegment(stage,snap);return;}if(kind==='fenwick'){renderFenwick(stage,snap);return;}if(kind==='grid'||kind==='sudoku'||kind==='maze'){renderGrid(stage,snap,kind,st);return;}if(kind==='bits'){renderBits(stage,snap);return;}if(kind==='string'){renderString(stage,snap,st);return;}const card=document.createElement('div');card.className='advanced-text-card';card.innerHTML=`<div class="advanced-kicker">${esc(infoLabel(advancedKey))}</div><h3>${esc(snap.title||infoLabel(advancedKey))}</h3><p>${esc(st?.explain||advancedInfo(advancedKey).def)}</p>`;stage.appendChild(card);}
   function infoLabel(k){return advancedInfo(k)?.title||k;}
 
   function renderHash(stage,snap,st){const box=document.createElement('div');box.className='hash-viz';(snap.slots||[]).forEach((v,i)=>{const slot=document.createElement('div');slot.className='hash-slot '+(st?.idx?.includes(i)?'active':'');slot.innerHTML=`<small>${i}</small><b>${v==null?'∅':esc(v)}</b>`;box.appendChild(slot);});stage.appendChild(box);if(snap.hash!==undefined){const p=document.createElement('div');p.className='advanced-callout';p.textContent=`hash(${snap.key}) = ${snap.hash}`;stage.appendChild(p);}}
@@ -12087,6 +12374,121 @@ document.addEventListener('keydown', (e)=>{
       default:
         return st?.explain || `The ${word} heap is being updated.`;
     }
+  }
+
+
+  function renderHeapSortStage(stage,snap,st){
+    const vals=Array.isArray(snap?.values)?snap.values:[];
+    const heapSize=Math.max(0,Math.min(vals.length,Number.isFinite(Number(snap?.heapSize))?Number(snap.heapSize):vals.length));
+    const selected=Array.isArray(st?.idx)?st.idx:[];
+    const shell=document.createElement('div');
+    shell.className='heap-reference-shell heap-sort-shell';
+
+    shell.innerHTML=`
+      <div class="heap-sort-title-card">
+        <div class="heap-sort-title-copy">
+          <h2>Heap Sort: Array → Binary Tree</h2>
+          <p>The tree is not a different data structure. It is the <b>same array arranged by position</b>. Position 1 is the root, positions 2–3 are its children, 4–7 are the next level, and so on.</p>
+        </div>
+        <div class="heap-sort-rule"><small>MAX-HEAP RULE</small><code>parent ≥ children</code></div>
+      </div>
+
+      <section class="heap-sort-panel">
+        <div class="heap-sort-section-head">
+          <b>1. Binary tree — live heap</b>
+          <span>${heapSize} active position${heapSize===1?'':'s'}</span>
+        </div>
+        <div class="heap-sort-tree-box" id="heapSortTree"></div>
+      </section>
+
+      <section class="heap-sort-panel heap-sort-array-panel">
+        <div class="heap-sort-section-head">
+          <b>2. Same array</b>
+          <span>1-based positions match the tree</span>
+        </div>
+        <div class="heap-sort-array" id="heapSortArray"></div>
+      </section>`;
+
+    const treeHost=shell.querySelector('#heapSortTree');
+    const arrayHost=shell.querySelector('#heapSortArray');
+
+    if(heapSize===0){
+      treeHost.innerHTML='<div class="heap-sort-empty">No active heap — every array position is sorted.</div>';
+    }else{
+      const treeVals=vals.slice(0,heapSize);
+      const mobile=window.innerWidth<=700;
+      const W=mobile?680:920;
+      const levelGap=mobile?62:72;
+      const levels=Math.max(1,Math.floor(Math.log2(Math.max(1,treeVals.length)))+1);
+      const H=Math.max(mobile?250:300,58+(levels-1)*levelGap+38);
+      const radius=mobile?22:30;
+      const svg=document.createElementNS('http://www.w3.org/2000/svg','svg');
+      svg.setAttribute('viewBox',`0 0 ${W} ${H}`);
+      svg.setAttribute('preserveAspectRatio','xMidYMin meet');
+      svg.setAttribute('role','img');
+      svg.setAttribute('aria-label','Heap Sort max heap shown as a complete binary tree');
+
+      const positions=[];
+      for(let i=0;i<treeVals.length;i++){
+        const level=Math.floor(Math.log2(i+1));
+        const first=(2**level)-1;
+        const pos=i-first;
+        const count=2**level;
+        positions[i]={x:W*(pos+0.5)/count,y:48+level*levelGap};
+      }
+
+      for(let i=1;i<treeVals.length;i++){
+        const parent=Math.floor((i-1)/2);
+        const line=document.createElementNS(svg.namespaceURI,'line');
+        line.setAttribute('x1',positions[parent].x);
+        line.setAttribute('y1',positions[parent].y+radius-1);
+        line.setAttribute('x2',positions[i].x);
+        line.setAttribute('y2',positions[i].y-radius+1);
+        line.setAttribute('class',selected.includes(i)||selected.includes(parent)?'heap-sort-edge active':'heap-sort-edge');
+        svg.appendChild(line);
+      }
+
+      positions.forEach((pt,i)=>{
+        const group=document.createElementNS(svg.namespaceURI,'g');
+        const circle=document.createElementNS(svg.namespaceURI,'circle');
+        const isRoot=i===0;
+        const isActive=selected.includes(i);
+        circle.setAttribute('cx',pt.x);
+        circle.setAttribute('cy',pt.y);
+        circle.setAttribute('r',String(radius));
+        circle.setAttribute('class',`heap-sort-node${isRoot?' root':''}${isActive?' selected':''}`);
+        group.appendChild(circle);
+
+        const value=document.createElementNS(svg.namespaceURI,'text');
+        value.setAttribute('x',pt.x);
+        value.setAttribute('y',pt.y+6);
+        value.setAttribute('text-anchor','middle');
+        value.setAttribute('class','heap-sort-value');
+        value.textContent=String(treeVals[i]);
+        group.appendChild(value);
+
+        const label=document.createElementNS(svg.namespaceURI,'text');
+        label.setAttribute('x',pt.x);
+        label.setAttribute('y',pt.y+radius+19);
+        label.setAttribute('text-anchor','middle');
+        label.setAttribute('class','heap-sort-position');
+        label.textContent=`position ${i+1}`;
+        group.appendChild(label);
+        svg.appendChild(group);
+      });
+      treeHost.appendChild(svg);
+    }
+
+    vals.forEach((v,i)=>{
+      const cell=document.createElement('div');
+      const isActive=selected.includes(i);
+      const isSorted=i>=heapSize;
+      cell.className=`heap-sort-array-cell${isActive?' selected':''}${isSorted?' sorted':''}`;
+      cell.innerHTML=`<small>position ${i+1}</small><b>${esc(v)}</b><span>${isSorted?'SORTED':'HEAP'}</span>`;
+      arrayHost.appendChild(cell);
+    });
+
+    stage.appendChild(shell);
   }
 
   function renderAdvancedHeap(stage,snap,st){
@@ -12227,6 +12629,17 @@ document.addEventListener('keydown', (e)=>{
   function renderAdvancedExplain(){
     const st=State.stepIdx>=0?State.steps[State.stepIdx]:State.steps[0];
     const body=document.getElementById('sidePanelBody');
+    if(advancedKey==='heapsort'){
+      const ss=st?.snapshot||{};
+      const heapSize=Number.isFinite(Number(ss.heapSize))?Number(ss.heapSize):0;
+      body.innerHTML=`
+        <div class="panel-hero"><div><div class="panel-kicker">SORTING · HEAP SORT</div><div class="panel-title">Heap Sort — Array + Binary Tree</div><div class="panel-subtitle">The array and the complete binary tree are two views of the same heap.</div></div><span class="panel-status">BEGINNER MODE</span></div>
+        <div class="panel-block"><h4>1. What is happening?</h4><p class="explain-text">Heap Sort first builds a <b>max heap</b>. The largest value moves to the root. Then we swap that root with the last unsorted position and repair the smaller heap.</p></div>
+        <div class="panel-block"><h4>2. Array ↔ binary tree</h4><div class="panel-callout"><b>Left child = 2i + 1</b><br><b>Right child = 2i + 2</b><br><b>Parent = ⌊(i − 1) / 2⌋</b><br><span>Index 0 is the tree root.</span></div></div>
+        <div class="panel-block"><h4>3. Current step</h4><div class="kv-row"><span>Operation</span><b>${esc(st?.op||'START')}</b></div><div class="kv-row"><span>Heap size</span><b>${heapSize}</b></div><p class="explain-text" style="margin-top:9px">${esc(st?.explain||'Press Next to see the first step.')}</p><p class="explain-text" style="margin-top:8px"><b>Why:</b> ${esc(st?.why||'Keep the max-heap rule correct.')}</p></div>
+        <div class="panel-block"><h4>4. Three simple phases</h4><div class="fund-section"><h4>Phase A — Build</h4><p>Turn the array into a max heap from the bottom upward.</p></div><div class="fund-section"><h4>Phase B — Place maximum</h4><p>Swap the root with the last unsorted position. That value is now fixed.</p></div><div class="fund-section"><h4>Phase C — Repair</h4><p>Compare the new root with its children and sift it down until the heap rule is true again.</p></div></div>`;
+      return;
+    }
     if(heapTopicKey(advancedKey)){
       const type=heapTypeForKey(advancedKey), word=type==='min'?'Min':'Max';
       const rule=type==='min'?'Parent ≤ child. The smallest value rises to the root.':'Parent ≥ child. The largest value rises to the root.';
@@ -13364,7 +13777,7 @@ class ActivitySelection {
       refreshAdvanced();
       toast('Input applied to the '+advancedInfo(advancedKey).title+' demo.');
     });
-    document.getElementById('advInputReset')?.addEventListener('click',()=>{if(heapTopicKey(advancedKey))heapWorkingValues=HEAP_SAMPLE.slice();delete advancedInputState[advancedKey];refreshAdvanced();renderAdvancedInput();toast('Sample input restored.');});
+    document.getElementById('advInputReset')?.addEventListener('click',()=>{if(heapTopicKey(advancedKey)||advancedKey==='heapsort')heapWorkingValues=HEAP_SAMPLE.slice();delete advancedInputState[advancedKey];refreshAdvanced();renderAdvancedInput();toast('Sample input restored.');});
   }
 
   const oldUpdateSidePanel=updateSidePanel;
@@ -13377,6 +13790,89 @@ class ActivitySelection {
   const oldOpenComingSoonTopic=openComingSoonTopic;
 
   window.isAdvancedRoadmapKey=isAdvanced;
+
+  // Heap Sort transport buttons need to call the advanced renderer directly because
+  // the legacy transport listeners were created before the advanced modules existed.
+  function heapSortIsActive(){return advancedKey==='heapsort' && isAdvanced(State.algo);}
+  function heapSortRenderCurrent(){if(!heapSortIsActive())return;renderAdvancedStep();updateStepUI();}
+  function heapSortNext(){
+    if(!heapSortIsActive())return;
+    pausePlayback();
+    if(State.stepIdx<State.steps.length-1){State.stepIdx++;heapSortRenderCurrent();}
+  }
+  function heapSortPrev(){
+    if(!heapSortIsActive())return;
+    pausePlayback();
+    if(State.stepIdx>-1){State.stepIdx--;heapSortRenderCurrent();}
+  }
+  function heapSortRestart(){
+    if(!heapSortIsActive())return;
+    pausePlayback();
+    State.stepIdx=-1;
+    refreshAdvanced();
+  }
+  function heapSortPlayPause(){
+    if(!heapSortIsActive())return;
+    if(State.playing){pausePlayback();return;}
+    if(!State.steps.length)return;
+    if(State.stepIdx>=State.steps.length-1){State.stepIdx=-1;renderAdvancedStep();}
+    State.playing=true;
+    const runId=++playbackRunId;
+    clearTimeout(State.timer);
+    const advance=()=>{
+      if(!State.playing || runId!==playbackRunId)return;
+      if(State.stepIdx>=State.steps.length-1){pausePlayback();return;}
+      State.stepIdx++;
+      renderAdvancedStep();
+      updateStepUI();
+      const step=State.steps[State.stepIdx];
+      const started=performance.now();
+      const waitForVoice=()=>{
+        if(!State.playing || runId!==playbackRunId)return;
+        const elapsed=performance.now()-started;
+        State.timer=setTimeout(advance,Math.max(220,State.speedMs-elapsed));
+      };
+      speakVisualizationStep(step,waitForVoice);
+    };
+    advance();
+  }
+  function bindHeapSortTransport(id,handler){
+    document.getElementById(id)?.addEventListener('click',e=>{
+      if(!heapSortIsActive())return;
+      e.preventDefault();
+      e.stopImmediatePropagation();
+      handler();
+    },true);
+  }
+  bindHeapSortTransport('btnRestart',heapSortRestart);
+  bindHeapSortTransport('btnPrev',heapSortPrev);
+  bindHeapSortTransport('btnPlay',heapSortPlayPause);
+  bindHeapSortTransport('btnNext',heapSortNext);
+
+  // Speed and explanation tabs are also normal buttons in the workspace. Capture
+  // them for Heap Sort so they never fall through to a legacy visualizer handler.
+  document.querySelectorAll('.speed-pill').forEach(b=>b.addEventListener('click',e=>{
+    if(!heapSortIsActive())return;
+    e.preventDefault();
+    e.stopImmediatePropagation();
+    document.querySelectorAll('.speed-pill').forEach(x=>x.classList.remove('active'));
+    b.classList.add('active');
+    State.speedMs=speedMap[b.dataset.speed];
+  },true));
+
+  document.querySelectorAll('.ws-tabs button').forEach(b=>b.addEventListener('click',e=>{
+    if(!heapSortIsActive())return;
+    e.preventDefault();
+    e.stopImmediatePropagation();
+    document.querySelectorAll('.ws-tabs button').forEach(x=>x.classList.remove('active'));
+    b.classList.add('active');
+    State.sideTab=b.dataset.side||'explain';
+    if(State.sideTab==='complexity')renderAdvancedInfo();
+    else if(State.sideTab==='code')renderAdvancedCode();
+    else if(State.sideTab==='input')renderAdvancedInput();
+    else renderAdvancedExplain();
+  },true));
+
   window.selectAdvancedRoadmap=selectAdvanced;
   window.renderAdvancedHome=()=>{};
 
@@ -13402,7 +13898,7 @@ class ActivitySelection {
   // Resolve the stable data-topic key first because several visible sidebar labels are intentionally shortened (e.g. "Searching", "Insertion", "Delete").
   document.querySelectorAll('[data-topic]').forEach(btn=>{btn.addEventListener('click',e=>{const topic=btn.dataset.topic||'';const label=btn.querySelector('.side-label')?.textContent?.trim()||'';const key=TOPIC_TO_ADV[topic]||TOPIC_TO_ADV[label];if(!key)return;e.preventDefault();e.stopImmediatePropagation();document.querySelectorAll('.side-item').forEach(b=>b.classList.remove('active'));btn.classList.add('active');goNav('workspace');selectAdvanced(key);},true);});
   // Capture the randomizer so advanced modules don't hit the legacy error branch.
-  document.getElementById('btnRandom')?.addEventListener('click',e=>{if(isAdvanced(State.algo)){e.stopImmediatePropagation();if(heapTopicKey(State.algo)){heapWorkingValues=randomHeapValues();advancedInputState[State.algo]={...(advancedInputState[State.algo]||{}),values:heapWorkingValues.join(', ')};refreshAdvanced();toast('New heap values created.');}else{refreshAdvanced();toast('Advanced visualization refreshed.');}}},true);
+  document.getElementById('btnRandom')?.addEventListener('click',e=>{if(isAdvanced(State.algo)){e.stopImmediatePropagation();if(State.algo==='heapsort'){heapWorkingValues=randomHeapValues();advancedInputState[State.algo]={values:heapWorkingValues.join(', ')};refreshAdvanced();toast('New Heap Sort array created.');}else if(heapTopicKey(State.algo)){heapWorkingValues=randomHeapValues();advancedInputState[State.algo]={...(advancedInputState[State.algo]||{}),values:heapWorkingValues.join(', ')};refreshAdvanced();toast('New heap values created.');}else{refreshAdvanced();toast('Advanced visualization refreshed.');}}},true);
 
   // ---------------------------- CHALLENGES ----------------------------
   const CHALLENGES=[
@@ -13828,6 +14324,7 @@ class ActivitySelection {
   }
 
   const HEAP_SAMPLE=[38,14,55,9,28,62,41,17];
+  const HEAP_SORT_SAMPLE=[16,14,10,8,7,9,3,2,4];
   let heapLearningType='min';
   let heapWorkingValues=HEAP_SAMPLE.slice();
   function heapTopicKey(key){return key==='heap'||String(key||'').startsWith('heap-')||String(key||'').startsWith('extract-');}
@@ -17952,6 +18449,753 @@ Node rotateLeft(Node x) {
 </script>
 
 </body>
+<script id="beginner-sorting-runtime-patch">
+(function(){
+  'use strict';
+
+  const SORT_KEYS = new Set(['merge','quick']);
+  const SORT_NAMES = {
+    merge:'Merge Sort',
+    quick:'Quick Sort',
+    heapsort:'Heap Sort'
+  };
+
+  const SORT_CODE = {
+    merge:`function mergeSort(arr, left, right) {
+  if (left >= right) return;
+
+  const middle = Math.floor((left + right) / 2);
+
+  // Sort the left half.
+  mergeSort(arr, left, middle);
+
+  // Sort the right half.
+  mergeSort(arr, middle + 1, right);
+
+  // Put the two sorted halves together.
+  merge(arr, left, middle, right);
+}
+
+function merge(arr, left, middle, right) {
+  const leftPart = arr.slice(left, middle + 1);
+  const rightPart = arr.slice(middle + 1, right + 1);
+
+  let i = 0;
+  let j = 0;
+  let k = left;
+
+  while (i < leftPart.length && j < rightPart.length) {
+    if (leftPart[i] <= rightPart[j]) {
+      arr[k] = leftPart[i];
+      i++;
+    } else {
+      arr[k] = rightPart[j];
+      j++;
+    }
+    k++;
+  }
+
+  while (i < leftPart.length) {
+    arr[k] = leftPart[i];
+    i++;
+    k++;
+  }
+
+  while (j < rightPart.length) {
+    arr[k] = rightPart[j];
+    j++;
+    k++;
+  }
+}`,
+    quick:`function quickSort(arr, low, high) {
+  if (low >= high) return;
+
+  const pivotIndex = partition(arr, low, high);
+
+  quickSort(arr, low, pivotIndex - 1);
+  quickSort(arr, pivotIndex + 1, high);
+}
+
+function partition(arr, low, high) {
+  const pivot = arr[high];
+  let smaller = low;
+
+  for (let current = low; current < high; current++) {
+    if (arr[current] < pivot) {
+      [arr[smaller], arr[current]] = [arr[current], arr[smaller]];
+      smaller++;
+    }
+  }
+
+  [arr[smaller], arr[high]] = [arr[high], arr[smaller]];
+  return smaller;
+}`,
+    heapsort:`function heapSort(arr) {
+  // Step 1: build a max heap.
+  for (let i = Math.floor(arr.length / 2) - 1; i >= 0; i--) {
+    heapify(arr, arr.length, i);
+  }
+
+  // Step 2: move the biggest value to the end.
+  for (let end = arr.length - 1; end > 0; end--) {
+    [arr[0], arr[end]] = [arr[end], arr[0]];
+    heapify(arr, end, 0);
+  }
+}
+
+function heapify(arr, size, root) {
+  let biggest = root;
+  const left = 2 * root + 1;
+  const right = 2 * root + 2;
+
+  if (left < size && arr[left] > arr[biggest]) {
+    biggest = left;
+  }
+
+  if (right < size && arr[right] > arr[biggest]) {
+    biggest = right;
+  }
+
+  if (biggest !== root) {
+    [arr[root], arr[biggest]] = [arr[biggest], arr[root]];
+    heapify(arr, size, biggest);
+  }
+}`
+  };
+
+  const SORT_GUIDE = {
+    merge:{
+      idea:'Split the array into smaller halves, sort each half, then merge the sorted halves.',
+      steps:['Split the current range into two halves.','Keep splitting until a range has one value.','Compare the first value of each sorted half.','Place the smaller value into the result and continue.','When both halves are finished, the whole range is sorted.'],
+      memory:'Merge Sort = split → sort → merge.',
+      complexity:{best:'O(n log n)',average:'O(n log n)',worst:'O(n log n)',space:'O(n)',stable:'Yes',inplace:'No'},
+      phase:'A small range is being split or merged.'
+    },
+    quick:{
+      idea:'Choose a pivot, put smaller values on the left and larger values on the right, then repeat on both sides.',
+      steps:['Choose the last value as the pivot.','Check each value against the pivot.','Move a smaller value into the next smaller-value position.','Put the pivot into its final position.','Repeat for the left and right parts.'],
+      memory:'Quick Sort = pivot → partition → repeat.',
+      complexity:{best:'O(n log n)',average:'O(n log n)',worst:'O(n²)',space:'O(log n) stack average',stable:'No',inplace:'Yes'},
+      phase:'A pivot is being placed into its final position.'
+    },
+    heapsort:{
+      idea:'Build a max heap so the biggest value is at the top, then repeatedly move that value to the end.',
+      steps:['Build a max heap from the array.','The root is the biggest value.','Swap the root with the last unsorted value.','Shrink the heap by one position.','Sift the new root down until the heap rule is correct.'],
+      memory:'Heap Sort = build max heap → move max to the end → repair.',
+      complexity:{best:'O(n log n)',average:'O(n log n)',worst:'O(n log n)',space:'O(1)',stable:'No',inplace:'Yes'},
+      phase:'The largest remaining value is being moved to the end.'
+    }
+  };
+
+  function esc(value){
+    const fn = window.escapeHtml;
+    return fn ? fn(String(value)) : String(value).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  }
+
+  function range(a,b){
+    const out=[];
+    for(let i=a;i<=b;i++) out.push(i);
+    return out;
+  }
+
+  function pushStep(steps, type, idx, op, explain, why, extra={}){
+    steps.push({type, idx:Array.isArray(idx)?idx:[], op, explain, why, codeLine:extra.codeLine||1, ...extra});
+  }
+
+  function genBeginnerMergeSort(input){
+    const arr=[...input], steps=[];
+
+    function merge(left,middle,right){
+      const leftPart=arr.slice(left,middle+1);
+      const rightPart=arr.slice(middle+1,right+1);
+      let i=0, j=0, k=left;
+
+      pushStep(steps,'set-range',range(left,right),'MERGE',
+        `Merge the two sorted parts: [${left}..${middle}] and [${middle+1}..${right}].`,
+        'Both halves are already sorted, so we only need to compare their front values.',{codeLine:17});
+
+      while(i<leftPart.length && j<rightPart.length){
+        const leftIndex=left+i, rightIndex=middle+1+j;
+        pushStep(steps,'compare',[leftIndex,rightIndex],'COMPARE',
+          `Compare ${leftPart[i]} and ${rightPart[j]}.`,
+          'The smaller front value is the next value in the merged range.',{codeLine:24});
+        if(leftPart[i] <= rightPart[j]){
+          arr[k]=leftPart[i];
+          pushStep(steps,'overwrite',[k],'PLACE',
+            `Place ${leftPart[i]} at index ${k}.`,
+            'The left front value is smaller (or equal), so it comes next.',{val:leftPart[i],codeLine:25});
+          i++;
+        }else{
+          arr[k]=rightPart[j];
+          pushStep(steps,'overwrite',[k],'PLACE',
+            `Place ${rightPart[j]} at index ${k}.`,
+            'The right front value is smaller, so it comes next.',{val:rightPart[j],codeLine:28});
+          j++;
+        }
+        k++;
+      }
+      while(i<leftPart.length){
+        arr[k]=leftPart[i];
+        pushStep(steps,'overwrite',[k],'PLACE',
+          `Copy the remaining ${leftPart[i]} into index ${k}.`,
+          'The right half is finished, so the remaining left values are already in order.',{val:leftPart[i],codeLine:33});
+        i++; k++;
+      }
+      while(j<rightPart.length){
+        arr[k]=rightPart[j];
+        pushStep(steps,'overwrite',[k],'PLACE',
+          `Copy the remaining ${rightPart[j]} into index ${k}.`,
+          'The left half is finished, so the remaining right values are already in order.',{val:rightPart[j],codeLine:38});
+        j++; k++;
+      }
+      pushStep(steps,'mark-sorted',range(left,right),'SORTED',
+        `The range [${left}..${right}] is sorted.`,
+        'The two sorted halves have been combined into one sorted range.',{codeLine:14});
+    }
+
+    function sort(left,right){
+      if(left>=right){
+        if(left===right) pushStep(steps,'mark-sorted',[left],'SORTED',
+          `Index ${left} has one value, so it is already sorted.`,
+          'A one-value range cannot be out of order.',{codeLine:3});
+        return;
+      }
+      const middle=Math.floor((left+right)/2);
+      pushStep(steps,'set-range',range(left,right),'SPLIT',
+        `Split [${left}..${right}] into [${left}..${middle}] and [${middle+1}..${right}].`,
+        'Smaller problems are easier to sort.',{codeLine:6});
+      sort(left,middle);
+      sort(middle+1,right);
+      merge(left,middle,right);
+    }
+
+    if(arr.length){ sort(0,arr.length-1); }
+    pushStep(steps,'mark-sorted',range(0,Math.max(0,arr.length-1)),'DONE',
+      `Merge Sort complete: ${arr.join(' → ')}.`,
+      'All ranges have been merged into one sorted array.',{codeLine:14,result:arr.slice()});
+    return {steps, final:arr};
+  }
+
+  function genBeginnerQuickSort(input){
+    const arr=[...input], steps=[];
+
+    function sort(low,high){
+      if(low>high) return;
+      if(low===high){
+        pushStep(steps,'mark-sorted',[low],'SORTED',
+          `Index ${low} has one value, so it is already sorted.`,
+          'A one-value range needs no work.',{codeLine:3});
+        return;
+      }
+
+      const pivot=arr[high];
+      pushStep(steps,'pivot',[high],'PIVOT',
+        `Choose ${pivot} at index ${high} as the pivot.`,
+        'The pivot separates smaller values from larger values.',{codeLine:7,pivotIdx:high});
+
+      let smaller=low;
+      for(let current=low; current<high; current++){
+        pushStep(steps,'compare',[current],'COMPARE',
+          `Compare ${arr[current]} with pivot ${pivot}.`,
+          'If a value is smaller than the pivot, it belongs on the left side.',{codeLine:12,pivotIdx:high});
+        if(arr[current] < pivot){
+          if(smaller!==current){
+            pushStep(steps,'swap',[smaller,current],'SWAP',
+              `Move ${arr[current]} to the left side at index ${smaller}.`,
+              'This keeps the smaller values together before the pivot.',{codeLine:14,pivotIdx:high});
+            [arr[smaller],arr[current]]=[arr[current],arr[smaller]];
+          }
+          smaller++;
+        }
+      }
+
+      pushStep(steps,'swap',[smaller,high],'SWAP',
+        `Place pivot ${pivot} at index ${smaller}.`,
+        'Every value on the left is smaller and every value on the right is not smaller.',{codeLine:18,pivotIdx:high});
+      [arr[smaller],arr[high]]=[arr[high],arr[smaller]];
+      pushStep(steps,'mark-sorted',[smaller],'SORTED',
+        `Pivot ${pivot} is now in its final position at index ${smaller}.`,
+        'The pivot does not need to move again.',{codeLine:18});
+
+      sort(low,smaller-1);
+      sort(smaller+1,high);
+    }
+
+    if(arr.length){ sort(0,arr.length-1); }
+    pushStep(steps,'mark-sorted',range(0,Math.max(0,arr.length-1)),'DONE',
+      `Quick Sort complete: ${arr.join(' → ')}.`,
+      'Every pivot is in its final place and all remaining parts are sorted.',{codeLine:18,result:arr.slice()});
+    return {steps, final:arr};
+  }
+
+  function genBeginnerHeapSort(input){
+    const arr=[...input], steps=[];
+
+    function siftDown(root,size){
+      while(true){
+        let biggest=root;
+        const left=2*root+1;
+        const right=2*root+2;
+
+        if(left<size){
+          pushStep(steps,'compare',[root,left],'COMPARE',
+            `Compare parent ${arr[root]} with left child ${arr[left]}.`,
+            'The bigger child may need to move up in a max heap.',{codeLine:17});
+          if(arr[left]>arr[biggest]) biggest=left;
+        }
+        if(right<size){
+          pushStep(steps,'compare',[biggest,right],'COMPARE',
+            `Compare ${arr[biggest]} with right child ${arr[right]}.`,
+            'We choose the biggest of the current node and its children.',{codeLine:21});
+          if(arr[right]>arr[biggest]) biggest=right;
+        }
+        if(biggest===root) return;
+        const moving=arr[biggest];
+        pushStep(steps,'swap',[root,biggest],'SWAP',
+          `Move ${moving} up by swapping it with ${arr[root]}.`,
+          'A max heap keeps the biggest value above smaller children.',{codeLine:26});
+        [arr[root],arr[biggest]]=[arr[biggest],arr[root]];
+        root=biggest;
+      }
+    }
+
+    pushStep(steps,'nop',[],'BUILD HEAP',
+      `Start by building a max heap from: [${arr.join(', ')}].`,
+      'A max heap puts the biggest value at the root.',{codeLine:4});
+
+    for(let i=Math.floor(arr.length/2)-1;i>=0;i--){
+      siftDown(i,arr.length);
+    }
+
+    pushStep(steps,'nop',[],'HEAP BUILT',
+      `Max heap built. The biggest value is ${arr[0]}.`,
+      'The root is now the biggest value in the unsorted part.',{codeLine:6});
+
+    for(let end=arr.length-1;end>0;end--){
+      pushStep(steps,'swap',[0,end],'PLACE',
+        `Move the biggest value ${arr[0]} to final index ${end}.`,
+        'The root of the max heap is the next value that belongs at the end.',{codeLine:10});
+      [arr[0],arr[end]]=[arr[end],arr[0]];
+      pushStep(steps,'mark-sorted',[end],'SORTED',
+        `Index ${end} is now sorted.`,
+        'The biggest value has reached its final position.',{codeLine:10});
+      siftDown(0,end);
+    }
+
+    if(arr.length){
+      pushStep(steps,'mark-sorted',[0],'SORTED',
+        'Only one value remains, so index 0 is sorted.',
+        'A single remaining value is automatically in the correct position.',{codeLine:10});
+    }
+    pushStep(steps,'mark-sorted',range(0,Math.max(0,arr.length-1)),'DONE',
+      `Heap Sort complete: ${arr.join(' → ')}.`,
+      'The max value was repeatedly moved to the end until the whole array was sorted.',{codeLine:12,result:arr.slice()});
+    return {steps, final:arr};
+  }
+
+  function sortResult(key,data){
+    if(key==='merge') return genBeginnerMergeSort(data);
+    if(key==='quick') return genBeginnerQuickSort(data);
+    return genBeginnerHeapSort(data);
+  }
+
+  function sortSnapshot(idx){
+    let working=[...State.data];
+    for(let i=0;i<=idx;i++){
+      const st=State.steps[i];
+      if(st.type==='swap' && st.idx?.length===2){
+        const [a,b]=st.idx;
+        [working[a],working[b]]=[working[b],working[a]];
+      }
+      if(st.type==='overwrite' && st.idx?.length){ working[st.idx[0]]=st.val; }
+    }
+    return working;
+  }
+
+  function makeBars(arr){
+    const root=document.getElementById('canvasContent');
+    if(!root) return;
+    root.innerHTML='';
+    State.scale=computeScale(arr.length?arr:[0]);
+    const wrap=document.createElement('div');
+    wrap.className='bars-viz beginner-sort-bars';
+    wrap.id='barsViz';
+    arr.forEach((v,i)=>{
+      const cell=document.createElement('div');
+      cell.className='bar-cell';
+      const bar=document.createElement('div');
+      bar.className='bar';
+      bar.style.height=pctForValue(v)+'%';
+      bar.textContent=v;
+      const idx=document.createElement('div');
+      idx.className='bar-idx';
+      idx.textContent=i;
+      cell.append(bar,idx);
+      wrap.appendChild(cell);
+    });
+    root.appendChild(wrap);
+    root.dataset.sorting='beginner';
+  }
+
+  function setSortBarState(i,state){
+    const bar=document.querySelector(`#barsViz .bar-cell:nth-child(${i+1}) .bar`);
+    if(bar) bar.dataset.state=state;
+  }
+
+  function renderBeginnerSortStep(){
+    if(!SORT_KEYS.has(State.algo)) return;
+    const idx=State.stepIdx;
+    const current=idx>=0?State.steps[idx]:State.steps[0];
+    const arr=idx>=0?sortSnapshot(idx):[...State.data];
+    const bars=document.querySelectorAll('#barsViz .bar');
+    arr.forEach((v,i)=>{
+      if(bars[i]){bars[i].style.height=pctForValue(v)+'%';bars[i].textContent=v;}
+    });
+    bars.forEach(b=>delete b.dataset.state);
+
+    for(let s=0;s<=idx;s++){
+      const st=State.steps[s];
+      if(st.type==='mark-sorted') st.idx.forEach(i=>setSortBarState(i,'sorted'));
+    }
+
+    if(current){
+      if(current.type==='compare') current.idx.forEach(i=>setSortBarState(i,'compare'));
+      if(current.type==='swap' || current.type==='overwrite') current.idx.forEach(i=>setSortBarState(i,'swap'));
+      if(current.type==='pivot') current.idx.forEach(i=>setSortBarState(i,'pivot'));
+      if(current.type==='set-range') current.idx.forEach(i=>setSortBarState(i,'visited'));
+      if(current.pivotIdx!==undefined) setSortBarState(current.pivotIdx,'pivot');
+    }
+
+    const root=document.getElementById('canvasContent');
+    let status=root?.querySelector('.sorting-status');
+    if(root && !status){
+      status=document.createElement('div');
+      status.className='sorting-status';
+      root.appendChild(status);
+    }
+    if(status){
+      const guide=SORT_GUIDE[State.algo];
+      let extra='';
+      if(State.algo==='quick' && current?.pivotIdx!==undefined){
+        extra=` · Pivot index ${current.pivotIdx}`;
+      }
+      if(State.algo==='merge' && current?.type==='set-range'){
+        extra=` · Range: ${current.idx[0]}..${current.idx[current.idx.length-1]}`;
+      }
+      status.innerHTML=`<b>${esc(current?.op||'START')}</b><span>${esc(guide.phase)}${esc(extra)}</span>`;
+    }
+
+    updateLiveVisualization(current);
+    updateSidePanel();
+    updateStepUI();
+  }
+
+  function renderBeginnerSortControls(){
+    const el=document.getElementById('wsControlsRow');
+    if(!el) return;
+    el.style.display='flex';
+    el.innerHTML=`
+      <div class="ws-size-group">
+        <label>SIZE</label>
+        <input type="range" id="ctrlSize" min="4" max="24" value="${State.data.length}">
+        <span class="ws-size-val" id="ctrlSizeVal">${State.data.length}</span>
+      </div>
+      <input type="text" class="ws-custom-input" id="ctrlCustom" placeholder="Try: 8, 3, 6, 1, 9">
+      <button class="wbtn apply" id="ctrlApply" type="button">✓ Apply</button>
+      <button class="wbtn randomize" id="ctrlRandomize" type="button">🎲 Randomize</button>
+      <button class="wbtn clear" id="ctrlClear" type="button">🗑 Clear</button>`;
+
+    const size=document.getElementById('ctrlSize');
+    size?.addEventListener('input',e=>{document.getElementById('ctrlSizeVal').textContent=e.target.value;});
+    size?.addEventListener('change',()=>{
+      const count=clamp(parseInt(size.value)||10,4,24);
+      State.data=randArray(count,1,99);
+      rebuildBeginnerSort();
+    });
+    document.getElementById('ctrlApply')?.addEventListener('click',()=>{
+      const raw=document.getElementById('ctrlCustom')?.value.trim()||'';
+      if(!raw){toast('Enter comma-separated numbers first.','error');return;}
+      const nums=raw.split(',').map(x=>Number(x.trim()));
+      if(nums.some(v=>!Number.isFinite(v))){toast('Use only valid numbers separated by commas.','error');return;}
+      if(nums.length<2){toast('Enter at least 2 numbers.','error');return;}
+      if(nums.length>24){toast('Use at most 24 numbers for a readable beginner visualization.','error');return;}
+      State.data=nums;
+      rebuildBeginnerSort();
+      toast('Custom data applied.');
+    });
+    document.getElementById('ctrlRandomize')?.addEventListener('click',()=>{
+      State.data=randArray(State.data.length||10,1,99);
+      rebuildBeginnerSort();
+      toast('Data randomized.');
+    });
+    document.getElementById('ctrlClear')?.addEventListener('click',()=>{
+      const input=document.getElementById('ctrlCustom');
+      if(input){input.value='';input.focus();}
+      toast('Custom input cleared.');
+    });
+  }
+
+  function renderSortPanel(){
+    const body=document.getElementById('sidePanelBody');
+    if(!body) return;
+    const key=State.algo;
+    const guide=SORT_GUIDE[key];
+    const st=State.stepIdx>=0?State.steps[State.stepIdx]:null;
+
+    if(State.sideTab==='code'){
+      const code=SORT_CODE[key];
+      body.innerHTML=`
+        <div class="panel-hero">
+          <div><div class="panel-kicker">BEGINNER CODE</div><div class="panel-title">${esc(SORT_NAMES[key])}</div><div class="panel-subtitle">A small implementation that matches the animation.</div></div>
+          <span class="panel-status">CODE</span>
+        </div>
+        <div class="panel-block code-card-shell">
+          <div class="code-card-toolbar"><h4>Read this first</h4><button class="code-copy-btn" id="beginnerSortCopy" type="button">⧉ Copy code</button></div>
+          <div class="panel-callout">${esc(guide.memory)} Start at the top and follow the comments and variable names one step at a time.</div>
+          <div class="code-wrap"><div id="codeBlock" data-code-source="beginner-sorting">${code.split('\\n').map((line,i)=>`<span class="code-line"><span class="code-lineno">${i+1}</span>${esc(line)}</span>`).join('\\n')}</div></div>
+        </div>`;
+      document.getElementById('beginnerSortCopy')?.addEventListener('click',e=>{
+        if(typeof copyCodeText==='function') copyCodeText(code,e.currentTarget);
+      });
+      return;
+    }
+
+    if(State.sideTab==='input'){
+      body.innerHTML=`
+        <div class="panel-hero"><div><div class="panel-kicker">SORTING INPUT</div><div class="panel-title">Make your own example</div><div class="panel-subtitle">Use the toolbar above or enter a small comma-separated array here.</div></div><span class="panel-status">EDITABLE</span></div>
+        <div class="panel-block"><h4>Values</h4><div class="input-card"><label for="beginnerSortInput">Array values</label><input id="beginnerSortInput" type="text" value="${esc(State.data.join(', '))}" placeholder="8, 3, 6, 1, 9" style="width:100%"></div><div class="input-row" style="margin-top:10px"><button class="btn btn-primary btn-sm" id="beginnerSortApply" type="button">✓ Apply values</button><button class="btn btn-ghost btn-sm" id="beginnerSortReset" type="button">↺ Random example</button></div></div>
+        <div class="panel-block"><h4>Good beginner test cases</h4><div class="fund-chiprow"><button class="fund-chip" data-sort-preset="8, 3, 6, 1, 9">Mixed</button><button class="fund-chip" data-sort-preset="1, 2, 3, 4, 5">Already sorted</button><button class="fund-chip" data-sort-preset="9, 7, 5, 3, 1">Reverse order</button><button class="fund-chip" data-sort-preset="5, 2, 5, 3, 2">Duplicates</button></div></div>`;
+      const apply=()=>{
+        const raw=document.getElementById('beginnerSortInput')?.value.trim()||'';
+        if(!raw){toast('Enter at least 2 numbers.','error');return;}
+        const nums=raw.split(',').map(x=>Number(x.trim()));
+        if(nums.some(v=>!Number.isFinite(v))||nums.length<2||nums.length>24){toast('Use 2–24 valid numbers.','error');return;}
+        State.data=nums;rebuildBeginnerSort();toast('Sorting input updated.');
+      };
+      document.getElementById('beginnerSortApply')?.addEventListener('click',apply);
+      document.getElementById('beginnerSortInput')?.addEventListener('keydown',e=>{if(e.key==='Enter')apply();});
+      document.getElementById('beginnerSortReset')?.addEventListener('click',()=>{State.data=randArray(8,1,99);rebuildBeginnerSort();toast('New random example created.');});
+      body.querySelectorAll('[data-sort-preset]').forEach(btn=>btn.addEventListener('click',()=>{document.getElementById('beginnerSortInput').value=btn.dataset.sortPreset;apply();}));
+      return;
+    }
+
+    if(State.sideTab==='complexity'){
+      const c=guide.complexity;
+      body.innerHTML=`
+        <div class="panel-hero"><div><div class="panel-kicker">PERFORMANCE</div><div class="panel-title">${esc(SORT_NAMES[key])}</div><div class="panel-subtitle">Complexity is shown separately from how fast the animation looks.</div></div><span class="panel-status">INFO</span></div>
+        <div class="panel-block"><h4>Time complexity</h4><div class="complexity-badges"><div class="cbadge"><div class="l">Best</div><div class="v">${c.best}</div></div><div class="cbadge"><div class="l">Average</div><div class="v">${c.average}</div></div><div class="cbadge"><div class="l">Worst</div><div class="v">${c.worst}</div></div></div></div>
+        <div class="panel-metrics"><div class="panel-metric"><div class="label">Space</div><div class="value">${esc(c.space)}</div></div><div class="panel-metric"><div class="label">Stable</div><div class="value">${c.stable}</div></div><div class="panel-metric"><div class="label">In-place</div><div class="value">${c.inplace}</div></div></div>
+        <div class="panel-block"><h4>Easy way to remember it</h4><div class="panel-callout">${esc(guide.memory)}</div></div>`;
+      return;
+    }
+
+    const currentText=st?.explain||'Press Next to see the first operation.';
+    const currentWhy=st?.why||guide.idea;
+    body.innerHTML=`
+      <div class="panel-hero"><div><div class="panel-kicker">BEGINNER MODE · SORTING</div><div class="panel-title">${esc(SORT_NAMES[key])}</div><div class="panel-subtitle">${esc(guide.idea)}</div></div><span class="panel-status">${esc(st?.op||'START')}</span></div>
+      <div class="panel-block"><h4>1. Think of it like this</h4><div class="panel-callout">${esc(guide.memory)}</div></div>
+      <div class="panel-block"><h4>2. What the algorithm does</h4>${guide.steps.map((x,i)=>`<div class="fund-section"><h4>${i+1}. ${esc(x)}</h4></div>`).join('')}</div>
+      <div class="panel-block"><h4>3. Current step</h4><div class="panel-callout"><b>${esc(st?.op||'READY')}</b><br>${esc(currentText)}</div><p class="explain-text" style="margin-top:8px">Why: ${esc(currentWhy)}</p></div>
+      <div class="panel-block"><h4>4. Final result</h4><p class="explain-text">${esc(State.steps.length?sortResult(key,State.data).final.join(' → '):State.data.join(' → '))}</p></div>`;
+  }
+
+  function rebuildBeginnerSort(){
+    if(!SORT_KEYS.has(State.algo)) return;
+    pausePlayback();
+    State.sortedArr=null;
+    State.steps=sortResult(State.algo,State.data).steps;
+    State.stepIdx=-1;
+    makeBars(State.data);
+    renderBeginnerSortControls();
+    renderBeginnerSortStep();
+    document.getElementById('vizMobileZoomHint')?.style.setProperty('display','block');
+  }
+
+  function selectBeginnerSort(key){
+    if(!SORT_KEYS.has(key)) return;
+    pausePlayback();
+    resetFilter();
+    State.algo=key;
+    State.sideTab='explain';
+    State.data=randArray(10,1,99);
+    State.steps=sortResult(key,State.data).steps;
+    State.stepIdx=-1;
+    document.querySelector('#view-workspace .workspace')?.classList.remove('fundamental-mode','race-mode');
+    const title=document.getElementById('wsTitle');
+    if(title) title.textContent=SORT_NAMES[key];
+    document.getElementById('wsControlsRow')?.style.setProperty('display','flex');
+    document.querySelectorAll('.ws-tabs button').forEach((b,i)=>b.classList.toggle('active',i===0));
+    const legend=document.getElementById('legendBar');
+    if(legend) legend.innerHTML='<span class="legend-caption">Beginner Sorting</span><span class="legend-hint">Next / Play shows one simple operation at a time.</span>';
+    makeBars(State.data);
+    renderBeginnerSortControls();
+    renderBeginnerSortStep();
+  }
+
+  // Hide the requested sorting study-only menu entries while keeping the three real sorts.
+  function cleanSortingSidebar(){
+    document.querySelectorAll('#sidebar .sidebar-section').forEach(section=>{
+      const label=section.querySelector(':scope > .disclosure .side-label')?.textContent?.trim();
+      if(label!=='12. Sorting') return;
+      const remove=new Set(['Comparisons','Swaps','Pivot','Partitions','Merge Process','Sorted Regions']);
+      section.querySelectorAll(':scope > .side-sub > .side-item').forEach(btn=>{
+        const text=btn.querySelector('.side-label')?.textContent?.trim();
+        if(remove.has(text)) btn.remove();
+      });
+    });
+  }
+
+  // Intercept programmatic selection after the existing advanced/custom routers are installed.
+  const baseSelect=window.selectAlgo;
+  const baseRenderStep=window.renderStep;
+  const baseRenderControls=window.renderControlsRow;
+  const baseRenderCanvas=window.renderCanvasBase;
+  const baseUpdateSide=window.updateSidePanel;
+  const baseRenderComplexity=window.renderComplexity;
+  const baseRenderCode=window.renderCode;
+  const baseRestart=window.restart;
+
+  window.selectAlgo=function(key,fromSidebar){
+    if(SORT_KEYS.has(key)){selectBeginnerSort(key);return;}
+    return baseSelect(key,fromSidebar);
+  };
+  window.renderStep=function(){
+    if(SORT_KEYS.has(State.algo)){renderBeginnerSortStep();return;}
+    return baseRenderStep();
+  };
+  window.renderControlsRow=function(){
+    if(SORT_KEYS.has(State.algo)){renderBeginnerSortControls();return;}
+    return baseRenderControls();
+  };
+  window.renderCanvasBase=function(){
+    if(SORT_KEYS.has(State.algo)){makeBars(State.data);return;}
+    return baseRenderCanvas();
+  };
+  window.updateSidePanel=function(){
+    if(SORT_KEYS.has(State.algo)){renderSortPanel();return;}
+    return baseUpdateSide();
+  };
+  window.renderComplexity=function(){
+    if(SORT_KEYS.has(State.algo)){State.sideTab='complexity';renderSortPanel();return;}
+    return baseRenderComplexity();
+  };
+  window.renderCode=function(){
+    if(SORT_KEYS.has(State.algo)){State.sideTab='code';renderSortPanel();return;}
+    return baseRenderCode();
+  };
+  window.restart=function(){
+    if(SORT_KEYS.has(State.algo)){rebuildBeginnerSort();return;}
+    return baseRestart();
+  };
+
+  // The original control listeners were attached before this patch. Capture the sorting-only cases first.
+  document.addEventListener('click',e=>{
+    const target=e.target?.closest?.('button');
+    if(!target) return;
+
+    const side=target.closest?.('.side-item[data-open]');
+    if(side && SORT_KEYS.has(side.dataset.open)){
+      e.preventDefault();
+      e.stopImmediatePropagation();
+      document.querySelectorAll('.side-item').forEach(b=>b.classList.remove('active'));
+      side.classList.add('active');
+      goNav('workspace');
+      selectBeginnerSort(side.dataset.open);
+      return;
+    }
+
+    if(target.id==='btnRestart' && SORT_KEYS.has(State.algo)){
+      e.preventDefault();
+      e.stopImmediatePropagation();
+      rebuildBeginnerSort();
+      return;
+    }
+
+    if(target.id==='btnRandom' && SORT_KEYS.has(State.algo)){
+      e.preventDefault();
+      e.stopImmediatePropagation();
+      State.data=randArray(State.data.length||10,1,99);
+      rebuildBeginnerSort();
+      toast('Data randomized.');
+      return;
+    }
+  },true);
+
+  // Keep Input / Code / Info tab clicks deterministic for the three sorting pages.
+  document.addEventListener('click',e=>{
+    const tab=e.target?.closest?.('#wsTabs button');
+    if(!tab || !SORT_KEYS.has(State.algo)) return;
+    e.preventDefault();
+    e.stopImmediatePropagation();
+    document.querySelectorAll('#wsTabs button').forEach(b=>b.classList.remove('active'));
+    tab.classList.add('active');
+    State.sideTab=tab.dataset.side;
+    if(State.sideTab==='complexity') renderSortPanel();
+    else renderSortPanel();
+  },true);
+
+  // Clean the menu now and again after any deferred catalog rendering.
+  cleanSortingSidebar();
+  setTimeout(cleanSortingSidebar,0);
+
+  // Initial direct handlers for the three sorting buttons protect against any earlier advanced capture listeners.
+  document.querySelectorAll('#sidebar .side-item[data-open]').forEach(btn=>{
+    if(!SORT_KEYS.has(btn.dataset.open)) return;
+    btn.addEventListener('click',e=>{
+      e.preventDefault();
+      e.stopImmediatePropagation();
+      document.querySelectorAll('.side-item').forEach(b=>b.classList.remove('active'));
+      btn.classList.add('active');
+      goNav('workspace');
+      selectBeginnerSort(btn.dataset.open);
+    },true);
+  });
+
+  // Expose a small test hook used by the final validation script.
+  window.__beginnerSortingPatch = {
+    keys:[...SORT_KEYS],
+    run(key,data){return sortResult(key,data).final.slice();},
+    menuLabels(){
+      const section=[...document.querySelectorAll('#sidebar .sidebar-section')].find(s=>s.querySelector(':scope > .disclosure .side-label')?.textContent?.trim()==='12. Sorting');
+      return section ? [...section.querySelectorAll(':scope > .side-sub > .side-item .side-label')].map(x=>x.textContent.trim()) : [];
+    },
+    reset:rebuildBeginnerSort
+  };
+})();
+</script>
+<style id="beginner-sorting-mobile-patch">
+/* Beginner sorting: compact, readable, touch-friendly on phones. */
+.beginner-sort-bars{width:min(100%,920px);height:280px;gap:8px;touch-action:pan-x pan-y;}
+.beginner-sort-bars .bar-cell{min-width:24px;max-width:72px;}
+.beginner-sort-bars .bar{font-size:13px;min-height:28px;}
+.sorting-status{width:min(920px,100%);margin:8px auto 0;padding:9px 12px;border:1px solid var(--border);border-radius:11px;background:var(--panel);display:flex;gap:10px;align-items:center;justify-content:center;flex-wrap:wrap;font:600 10.5px var(--font-mono);color:var(--text-1);text-align:center;}
+.sorting-status b{color:var(--accent);letter-spacing:.06em;}
+.sorting-status span{color:var(--text-2);font-family:var(--font-body);font-size:11px;}
+@media(max-width:700px){
+  .beginner-sort-bars{height:230px;gap:5px;padding:0 2px 5px;}
+  .beginner-sort-bars .bar-cell{min-width:17px;max-width:58px;gap:6px;}
+  .beginner-sort-bars .bar{font-size:10px;padding-top:7px;border-radius:7px 7px 5px 5px;}
+  .beginner-sort-bars .bar-idx{font-size:8px;}
+  .sorting-status{margin-top:6px;padding:8px 9px;font-size:9.5px;gap:6px;}
+  .sorting-status span{font-size:10px;}
+  #wsControlsRow:has(#ctrlCustom){display:grid!important;grid-template-columns:1fr 1fr;gap:8px;padding:10px;}
+  #wsControlsRow:has(#ctrlCustom) .ws-size-group{grid-column:1 / -1;width:100%;}
+  #wsControlsRow:has(#ctrlCustom) .ws-size-group input[type=range]{flex:1;min-width:0;width:auto;}
+  #wsControlsRow:has(#ctrlCustom) .ws-custom-input{grid-column:1 / -1;min-width:0;max-width:none;width:100%;}
+  #wsControlsRow:has(#ctrlCustom) .wbtn{width:100%;justify-content:center;min-height:40px;padding:9px 10px;}
+  #wsTabs{overflow-x:auto;scrollbar-width:none;}
+  #wsTabs::-webkit-scrollbar{display:none;}
+  #wsTabs button{min-width:112px;flex:0 0 auto;}
+}
+@media(max-width:420px){
+  .beginner-sort-bars{height:205px;}
+  .beginner-sort-bars .bar-cell{min-width:14px;max-width:44px;}
+  .beginner-sort-bars .bar{font-size:9px;padding-top:6px;}
+  .beginner-sort-bars .bar-idx{font-size:7px;}
+  .sorting-status span{max-width:100%;}
+}
+</style>
+
 </html>
 
 <style id="tree-theory-strip-compact-guard">.tree-theory-strip{display:none !important;}</style>
